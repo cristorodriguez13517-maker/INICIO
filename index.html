@@ -3,330 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Netflix Smart TV - FINAL</title>
+<title>Netflix Smart TV - Menu Lateral Oscuro</title>
 
 <style>
-* { box-sizing:border-box; }
-body { margin:0; background:#000; color:#fff; font-family:Arial,sans-serif; overflow-x:hidden; }
+* { box-sizing:border-box; margin:0; padding:0; }
 
-/* HEADER */
+body {
+  background:#000;
+  color:#fff;
+  font-family:Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+a, button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus,
+a:active,
+a:focus-visible {
+  outline: none;
+  background: transparent;
+}
+
+/* Header fullscreen */
 .header {
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:320px;
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  align-items:center;
-  padding:20px;
-  z-index:10;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 1s ease-in-out;
 }
 
+/* Sombra lateral */
 .header::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.9) 40%, transparent 100%),
-    linear-gradient(to bottom, transparent 20%, #000 100%);
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 380px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.90) 0%,
+    rgba(0,0,0,0.75) 30%,
+    rgba(0,0,0,0) 75%
+  );
+  z-index: 5;
+  pointer-events: none;
 }
 
-.header-info {
-  position:relative;
-  z-index:2;
-  max-width:470px;
-  opacity:0;
-  transition:0.3s;
+/* Menú lateral */
+.header-top {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-left: 20px;
+  z-index: 10;
 }
 
-.header-info.visible { opacity:1; }
-
-.header h1 img {
-  max-width:300px;
-  max-height:80px;
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
-/* META Y OVERVIEW */
-.details { 
-  font-size:15px; 
-  font-weight:bold; 
-  margin:8px 0;
+.menu-item {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  transition: color 0.2s, transform 0.2s;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9);
 }
 
-.overview { 
-  font-size:12px; 
-  line-height:1.4; 
-  max-width:450px;
+.menu-item:hover,
+.menu-item:focus,
+.menu-item.active {
+  color: #E50914;
+  transform: scale(1.1);
 }
 
-/* FILAS */
-.content {
-  padding:20px;
-  margin-top:320px;
-}
-.movie-row {
-  display:grid;
-  grid-template-columns:repeat(8,105px);
-  gap:12px;
-  margin-top:20px;
-}
-.movie-row.hidden { display:none; }
-
-/* PELIS */
-.movie {
-  cursor:pointer;
-  outline:none;
-}
-.movie img {
-  width:105px;
-  height:160px;
-  object-fit:cover;
+/* Logo */
+.header-logo {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 }
 
-.movie:hover,
-.movie:focus {
-  transform:scale(1.1);
-  z-index:10;
-}
-
-.movie.selected img {
-  border:3px solid #E50914;
-}
-
-/* BUSCADOR */
-.search-container { 
-  position:fixed; 
-  top:20px; 
-  right:30px; 
-  display:flex; 
-  align-items:center; 
-  gap:10px; 
-  z-index:50; 
-}
-
-.search-button { 
-  background:none; 
-  border:none; 
-  cursor:pointer; 
-  display:flex; 
-  align-items:center; 
-  justify-content:center; 
-  outline:none; 
-  transition: transform .2s; 
-}
-
-.search-button svg { 
-  width:24px; 
-  height:24px; 
-  fill:white; 
-}
-
-.search-button:hover { 
-  transform: scale(1.2); 
-}
-
-.search-input {
-  width:0; 
-  padding:8px 12px; 
-  border-radius:20px; 
-  border:1px solid rgba(255,255,255,0.5);
-  background:rgba(0,0,0,0.5); 
-  color:#fff; 
-  outline:none; 
-  opacity:0; 
-  transition:width 0.2s, opacity 0.2s, transform 0.2s;
-}
-
-.search-input.active, 
-.search-input:focus { 
-  width:220px; 
-  opacity:1; 
-  transform: scale(1.05); 
+.header-logo img {
+  max-width: 300px;
+  width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(0,0,0,0.9));
+  transition: opacity 1.0s ease;
 }
 </style>
 </head>
 
 <body>
 
-<!-- BUSCADOR -->
-<div class="search-container">
-  <button class="search-button" id="search-button">
-    <svg viewBox="0 0 24 24">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z"></path>
-    </svg>
-  </button>
-  <input type="text" id="search" class="search-input" placeholder="Buscar...">
-</div>
-
-<!-- HEADER -->
 <div class="header" id="header">
-  <div class="header-info" id="info">
-    <h1 id="title"></h1>
-    <div id="meta" class="details"></div>
-    <p id="overview" class="overview"></p>
+
+  <div class="header-top">
+    <nav class="menu">
+      <a href="go:peliculas" class="menu-item">Películas</a>
+      <a href="go:series" class="menu-item">Series</a>
+      <a href="go:kids" class="menu-item">Kids</a>
+    </nav>
   </div>
-</div>
 
-<!-- CONTENIDO -->
-<div class="content">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <div class="header-logo">
+    <img id="header-logo-img" src="">
+  </div>
 
 </div>
 
 <script>
-const movies = document.querySelectorAll('.movie');
-const rows = document.querySelectorAll('.movie-row');
-
 const header = document.getElementById('header');
-const info = document.getElementById('info');
-const title = document.getElementById('title');
-const meta = document.getElementById('meta');
-const overview = document.getElementById('overview');
+const logoImg = document.getElementById('header-logo-img');
 
-const searchInput = document.getElementById('search');
-const searchButton = document.getElementById('search-button');
+/* 🌐 IMÁGENES */
+const banners = [
+  "https://image.tmdb.org/t/p/original/kxQiIJ4gVcD3K6o14MJ72p5yRcE.jpg",
+  "https://image.tmdb.org/t/p/original/i5i7xWRO70oGLM5AMR5jN0GL7EZ.jpg",
+  "https://image.tmdb.org/t/p/original/j3iDM8iNZgTXocuqzK2ZnVgaLnJ.jpg",
+  "https://image.tmdb.org/t/p/original/4I4KTPcFRvEQmQQ18Mx51rgxVMn.jpg",
+  "https://image.tmdb.org/t/p/original/ufSwlnECLoUbBjPrFqEQcWBzHwc.jpg",
+  "https://image.tmdb.org/t/p/original/3eUyLEF5M0ky3h6KJsWiWzaakB8.jpg",
+  "https://image.tmdb.org/t/p/original/fx2cEuadZK28VHKkc0F1nFR96i0.jpg",
+  "https://image.tmdb.org/t/p/original/wQOhbCP6H8bO5ddlXDZT207orew.jpg"
+];
 
-let activeRow = 0;
+const logos = [
+  "https://image.tmdb.org/t/p/original/6iBGJAaGKJ0xDhsnowxKDROLqyK.png",
+  "https://image.tmdb.org/t/p/original/gsD5xIliP0YFfjXETFInVvNuIVL.png",
+  "https://image.tmdb.org/t/p/original/wG6N1HeMbxpWlMjQcYfr8lDrkJQ.png",
+  "https://image.tmdb.org/t/p/original/uRU97kOS5FvpNfONpV2MmZSzbUH.png",
+  "https://image.tmdb.org/t/p/original/6Q34kuByPGmsocjjbkn1DOaccz4.png",
+  "https://image.tmdb.org/t/p/original/1HXrIujSjhWKthsj94BnrjqwZr5.png",
+  "https://image.tmdb.org/t/p/original/3DAVQj43XCHS8w16qV6t9hE08jk.png",
+  "https://image.tmdb.org/t/p/original/6M6muG0CH9Y5BGhTCrtN5z1ffCq.png"
+];
 
-/* INICIO */
-rows.forEach((r,i)=>{ if(i!==0) r.classList.add('hidden'); });
+let currentIndex = -1;
 
-function showRow(i){
-  rows.forEach((r,index)=>{
-    r.classList.toggle('hidden', index!==i);
-  });
-  activeRow = i;
+/* 🎲 Índice aleatorio sin repetir consecutivo */
+function getRandomIndex() {
+  let newIndex;
+  do {
+    newIndex = Math.floor(Math.random() * banners.length);
+  } while (newIndex === currentIndex);
+  return newIndex;
 }
 
-function selectMovie(movie){
-  movies.forEach(m=>m.classList.remove('selected'));
-  movie.classList.add('selected');
+/* 🔁 Cambiar slide */
+function cambiarSlide() {
 
-  header.style.backgroundImage = `url(${movie.dataset.banner})`;
+  currentIndex = getRandomIndex();
 
-  if(movie.dataset.logo){
-    title.innerHTML = `<img src="${movie.dataset.logo}">`;
-  } else {
-    title.textContent = movie.dataset.title;
-  }
+  /* Fondo */
+  header.style.backgroundImage = `url('${banners[currentIndex]}')`;
 
-  meta.textContent = movie.dataset.meta;
-  overview.textContent = movie.dataset.overview;
+  /* Logo con fade */
+  logoImg.style.opacity = 0;
 
-  info.classList.add('visible');
+  setTimeout(() => {
+    logoImg.src = logos[currentIndex];
+    logoImg.style.opacity = 1;
+  }, 300);
 }
 
-/* EVENTOS */
-rows.forEach((row,rowIndex)=>{
-  row.querySelectorAll('.movie').forEach(movie=>{
-    movie.addEventListener('focus', ()=>{
-      showRow(rowIndex);
-      selectMovie(movie);
-    });
+/* 🚀 Inicio */
+cambiarSlide();
 
-    movie.addEventListener('mouseenter', ()=>{
-      showRow(rowIndex);
-      selectMovie(movie);
-    });
-  });
+/* ⚡ Precarga de imágenes */
+banners.forEach(src => {
+  const img = new Image();
+  img.src = src;
 });
 
-/* FLECHAS */
-document.addEventListener('keydown', e=>{
-  if(e.key==='ArrowDown' && activeRow<rows.length-1){
-    showRow(activeRow+1);
-    rows[activeRow].querySelector('.movie')?.focus();
-  }
+/* ⏱️ Auto cambio */
+setInterval(cambiarSlide, 5000);
 
-  if(e.key==='ArrowUp' && activeRow>0){
-    showRow(activeRow-1);
-    rows[activeRow].querySelector('.movie')?.focus();
-  }
-});
 
-/* BUSCADOR */
-searchButton.addEventListener('click', ()=>{
-  searchInput.classList.add('active');
-  searchInput.focus();
-});
+/* 🎮 Menú */
+const menuItems = document.querySelectorAll('.menu-item');
 
-searchInput.addEventListener('blur', ()=>{
-  if(!searchInput.value){
-    searchInput.classList.remove('active');
-
-    rows.forEach((row,i)=>{
-      row.style.display='';
-      row.classList.toggle('hidden', i!==0);
-
-      row.querySelectorAll('.movie').forEach(m=>{
-        m.style.display='';
-      });
-    });
-
-    activeRow=0;
-    rows[0].querySelector('.movie')?.focus();
-  }
-});
-
-searchInput.addEventListener('input', ()=>{
-  const query = searchInput.value.toLowerCase().trim();
-  let firstMatch=null;
-
-  rows.forEach((row,rowIndex)=>{
-    let visible=false;
-
-    row.querySelectorAll('.movie').forEach(movie=>{
-      const title = movie.dataset.title.toLowerCase();
-      const match = title.includes(query);
-
-      movie.style.display = match?'block':'none';
-
-      if(match){
-        visible=true;
-        if(!firstMatch){
-          firstMatch=movie;
-          showRow(rowIndex);
-        }
-      }
-    });
-
-    row.style.display = visible?'grid':'none';
+menuItems.forEach(item=>{
+  item.addEventListener('mouseenter', () => {
+    item.classList.add('active');
   });
 
-  if(!query){
-    rows.forEach((row,i)=>{
-      row.style.display='';
-      row.querySelectorAll('.movie').forEach(m=>m.style.display='');
-    });
-    showRow(0);
-  }
+  item.addEventListener('mouseleave', () => {
+    item.classList.remove('active');
+  });
 });
-
-/* 🔥 INICIO CON PRIMERA PELÍCULA */
-const firstMovie = rows[0].querySelector('.movie');
-if(firstMovie){
-  firstMovie.focus();
-  selectMovie(firstMovie);
-}
 </script>
 
 </body>
