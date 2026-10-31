@@ -134,7 +134,7 @@ a, button {
     text-shadow 0.25s ease;
 }
 
-/* Selección: solo se ilumina el texto, nunca aparece un recuadro */
+/* Selección: solo se ilumina el texto, sin recuadro */
 
 .menu-item,
 .menu-item:hover,
@@ -156,7 +156,6 @@ a, button {
   color: #ff3038;
   transform: scale(1.08);
   transform-origin: left center;
-  /* Luminosidad suave: destaca sin difuminar las letras */
   text-shadow: 0 0 2px rgba(229,9,20,0.45);
 }
 
@@ -189,7 +188,7 @@ a, button {
 }
 
 /* =================================
-   MÓVILES
+   MÓVILES Y TABLETS
 ================================= */
 
 @media (max-width: 600px) {
@@ -229,17 +228,27 @@ a, button {
   position: fixed;
   top: 0;
   left: 0;
-  width: 35px;
+  width: 45px;
   height: 100vh;
-  z-index: 15;
+  z-index: 30;
   background: transparent;
   display: none;
+  touch-action: pan-y;
 }
 
 @media (hover: none) and (pointer: coarse) {
   .touch-zone {
     display: block;
   }
+}
+
+/* Evitar selección de texto al tocar */
+
+.menu,
+.menu-item,
+.touch-zone {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 </style>
@@ -296,7 +305,6 @@ a, button {
 
 <div class="touch-zone" id="touch-zone"></div>
 
-
 <script>
 
 /* =========================================
@@ -305,18 +313,40 @@ a, button {
 
 const header = document.getElementById("header");
 const logoImg = document.getElementById("header-logo-img");
+
 const menuItems = Array.from(
   document.querySelectorAll(".menu-item")
 );
+
 const menu = document.getElementById("menu");
+
 const aviso = document.createElement("div");
 aviso.id = "menu-aviso";
 aviso.textContent = "Próximamente";
-aviso.style.cssText = "position:fixed;left:50%;bottom:35px;transform:translateX(-50%);padding:12px 22px;background:rgba(20,20,20,.92);border:1px solid #E50914;border-radius:5px;color:#fff;font-size:16px;z-index:100;opacity:0;visibility:hidden;transition:opacity .2s ease;pointer-events:none;";
+aviso.style.cssText = `
+  position:fixed;
+  left:50%;
+  bottom:35px;
+  transform:translateX(-50%);
+  padding:12px 22px;
+  background:rgba(20,20,20,.92);
+  border:1px solid #E50914;
+  border-radius:5px;
+  color:#fff;
+  font-size:16px;
+  z-index:100;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .2s ease;
+  pointer-events:none;
+`;
+
 document.body.appendChild(aviso);
+
 let avisoTimer = null;
 
 const touchZone = document.getElementById("touch-zone");
+const menuContainer = document.getElementById("menu-container");
 
 let menuVisible = false;
 let selectedIndex = 0;
@@ -464,7 +494,6 @@ async function cargarCatalogo(catalogo) {
     }
 
     const data = await respuesta.json();
-
     const registros = extraerRegistros(data);
 
     const elementos = registros.map(item => {
@@ -548,7 +577,6 @@ function precargarImagen(src) {
     const img = new Image();
 
     img.onload = () => resolve(true);
-
     img.onerror = () => resolve(false);
 
     img.src = src;
@@ -619,54 +647,67 @@ async function cambiarSlide() {
 
 
 /* =========================================
+   MEZCLAR ALEATORIAMENTE
+========================================= */
+
+function mezclarAleatoriamente(lista) {
+
+  const resultado = [...lista];
+
+  for (let i = resultado.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [resultado[i], resultado[j]] =
+      [resultado[j], resultado[i]];
+  }
+
+  return resultado;
+}
+
+
+/* =========================================
    INICIAR CARRUSEL
 ========================================= */
 
 async function iniciarSharkTV() {
 
-  console.log("Cargando novedades SHARKTV...");
+  console.log("Cargando catálogo SHARKTV...");
 
   const resultados = await Promise.all(
     catalogos.map(cargarCatalogo)
   );
 
   banners = resultados.flat();
-
   banners = eliminarDuplicados(banners);
 
   /*
      ORDEN DEL CARRUSEL:
-     1. Las 10 novedades más recientes ocupan el primer bloque,
-        pero también se mezclan aleatoriamente entre sí.
-     2. El resto se mezcla aleatoriamente dentro de cada categoría.
-     3. Se mantiene el orden de categorías: Kids, Series y Películas.
-     Todo el carrusel cambia de orden desde la primera imagen
-     cada vez que se carga SHARKTV.
+     1. Las 10 novedades más recientes se muestran primero,
+        en orden aleatorio.
+     2. Después aparece el resto de Kids, aleatoriamente.
+     3. Después Series, aleatoriamente.
+     4. Después Películas, aleatoriamente.
+     El orden se genera de nuevo cada vez que se carga la página.
   */
 
   const CANTIDAD_NOVEDADES = 10;
 
-  // Copia ordenada por fecha para conservar las novedades al principio.
-  const porFecha = [...banners].sort((a, b) => b.fecha - a.fecha);
-  const novedadesOrdenadas = porFecha.slice(0, CANTIDAD_NOVEDADES);
-  const resto = porFecha.slice(CANTIDAD_NOVEDADES);
+  const porFecha = [...banners].sort(
+    (a, b) => b.fecha - a.fecha
+  );
 
-  // Barajar un grupo sin alterar el array original.
-  function mezclarAleatoriamente(lista) {
-    const resultado = [...lista];
+  const novedadesOrdenadas =
+    porFecha.slice(0, CANTIDAD_NOVEDADES);
 
-    for (let i = resultado.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [resultado[i], resultado[j]] = [resultado[j], resultado[i]];
-    }
+  const resto =
+    porFecha.slice(CANTIDAD_NOVEDADES);
 
-    return resultado;
-  }
+  // Aleatorizar las novedades desde el primer banner.
+  const novedades =
+    mezclarAleatoriamente(novedadesOrdenadas);
 
-  // Las novedades siguen siendo las más recientes, pero su posición
-  // también cambia aleatoriamente desde el primer banner.
-  const novedades = mezclarAleatoriamente(novedadesOrdenadas);
-
+  // Resto del catálogo por categorías.
   const restoKids = mezclarAleatoriamente(
     resto.filter(item => item.catalogo === "Kids")
   );
@@ -746,7 +787,6 @@ function ocultarMenu() {
   header.classList.remove("menu-visible");
 
   clearTimeout(hideTimer);
-
 }
 
 
@@ -763,7 +803,6 @@ function reiniciarTemporizador() {
     ocultarMenu();
 
   }, HIDE_DELAY);
-
 }
 
 
@@ -782,22 +821,33 @@ function actualizarSeleccion() {
 
   });
 
-  // Mantener siempre la opción seleccionada dentro de las tres visibles.
+  // Mantener la opción seleccionada dentro de las tres visibles.
   const primeraVisible = Math.max(
     0,
     Math.min(selectedIndex - 2, menuItems.length - 3)
   );
 
-  menu.style.transform = `translateY(-${primeraVisible * 50}px)`;
+  menu.style.transform =
+    `translateY(-${primeraVisible * 50}px)`;
 }
 
+
+/* =========================================
+   AVISO PRÓXIMAMENTE
+========================================= */
+
 function mostrarAviso() {
+
   aviso.style.opacity = "1";
   aviso.style.visibility = "visible";
+
   clearTimeout(avisoTimer);
+
   avisoTimer = setTimeout(() => {
+
     aviso.style.opacity = "0";
     aviso.style.visibility = "hidden";
+
   }, 2200);
 }
 
@@ -821,7 +871,6 @@ function moverSeleccion(direccion) {
   }
 
   actualizarSeleccion();
-
 }
 
 
@@ -839,6 +888,7 @@ function entrarSeccion() {
   const enlace = menuItems[selectedIndex];
 
   if (enlace) {
+
     if (enlace.dataset.comingSoon === "true") {
       mostrarAviso();
       reiniciarTemporizador();
@@ -847,7 +897,6 @@ function entrarSeccion() {
 
     window.location.href = enlace.href;
   }
-
 }
 
 
@@ -894,7 +943,6 @@ document.addEventListener("keydown", function(e) {
     }
 
     reiniciarTemporizador();
-
   }
 
   /* Botón OK / ENTER */
@@ -907,7 +955,6 @@ document.addEventListener("keydown", function(e) {
     e.preventDefault();
 
     entrarSeccion();
-
   }
 
   /* Botón ATRÁS / ESC */
@@ -918,7 +965,6 @@ document.addEventListener("keydown", function(e) {
   ) {
 
     ocultarMenu();
-
   }
 
 });
@@ -937,7 +983,6 @@ menuItems.forEach((item, index) => {
     mostrarMenu();
 
     actualizarSeleccion();
-
   });
 
   item.addEventListener("click", (e) => {
@@ -946,45 +991,126 @@ menuItems.forEach((item, index) => {
     actualizarSeleccion();
 
     if (item.dataset.comingSoon === "true") {
+
       e.preventDefault();
+
       mostrarAviso();
       reiniciarTemporizador();
     }
-
   });
 
 });
 
 
 /* =========================================
-   ZONA TÁCTIL MÓVIL
+   CONTROLES TÁCTILES MÓVIL / TABLET
 ========================================= */
 
+let touchStartY = 0;
+let touchStartX = 0;
+let touchGestureHandled = false;
+
+// Tocar la franja izquierda abre o cierra el menú.
 touchZone.addEventListener("click", () => {
 
+  if (touchGestureHandled) {
+    touchGestureHandled = false;
+    return;
+  }
+
   if (menuVisible) {
-
     ocultarMenu();
-
   } else {
+    mostrarMenu();
+  }
+});
+
+// Detectar inicio del gesto táctil.
+touchZone.addEventListener("touchstart", (e) => {
+
+  if (!e.changedTouches.length) return;
+
+  touchStartY = e.changedTouches[0].clientY;
+  touchStartX = e.changedTouches[0].clientX;
+  touchGestureHandled = false;
+
+}, { passive: true });
+
+// Deslizar verticalmente por la franja para navegar.
+touchZone.addEventListener("touchend", (e) => {
+
+  if (!e.changedTouches.length) return;
+
+  const deltaY =
+    e.changedTouches[0].clientY - touchStartY;
+
+  const deltaX =
+    e.changedTouches[0].clientX - touchStartX;
+
+  if (
+    Math.abs(deltaY) > 35 &&
+    Math.abs(deltaY) > Math.abs(deltaX)
+  ) {
+
+    touchGestureHandled = true;
 
     mostrarMenu();
 
+    // Deslizar hacia arriba baja por las opciones.
+    // Deslizar hacia abajo sube por las opciones.
+    moverSeleccion(deltaY < 0 ? 1 : -1);
+
+    reiniciarTemporizador();
   }
+
+}, { passive: true });
+
+// Tocar directamente el menú lo mantiene visible.
+menuContainer.addEventListener("touchstart", () => {
+
+  mostrarMenu();
+  reiniciarTemporizador();
+
+}, { passive: true });
+
+// Tocar una opción del menú permite entrar en ella.
+menuItems.forEach((item, index) => {
+
+  item.addEventListener("touchend", (e) => {
+
+    e.preventDefault();
+
+    selectedIndex = index;
+    actualizarSeleccion();
+
+    if (item.dataset.comingSoon === "true") {
+
+      mostrarAviso();
+      reiniciarTemporizador();
+
+    } else {
+
+      window.location.href = item.href;
+    }
+
+  }, { passive: false });
 
 });
 
+// Tocar fuera del menú lo oculta.
+document.addEventListener("touchstart", (e) => {
 
-/* =========================================
-   TOCAR MENÚ
-========================================= */
+  if (!menuVisible) return;
 
-document.getElementById("menu-container")
-  .addEventListener("touchstart", () => {
+  if (
+    !menuContainer.contains(e.target) &&
+    !touchZone.contains(e.target)
+  ) {
 
-    reiniciarTemporizador();
+    ocultarMenu();
+  }
 
-  }, { passive: true });
+}, { passive: true });
 
 
 /* =========================================
