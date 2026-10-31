@@ -139,14 +139,20 @@ body {
         border-color 0.2s;
 }
 
-/* OPCION SELECCIONADA */
+/* OPCIÓN SELECCIONADA EN ROJO */
 
 .menu-item.selected {
-    color: #fff;
-    background: rgba(255,255,255,0.10);
-    border-left: 4px solid #e50914;
+    color: #ffffff;
+    background: linear-gradient(
+        90deg,
+        rgba(229, 9, 20, 0.95),
+        rgba(229, 9, 20, 0.25)
+    );
+    border-left: 5px solid #ff0000;
     padding-left: 25px;
-    text-shadow: 0 0 12px rgba(255,255,255,0.3);
+    text-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.25);
+    transform: scale(1.04);
 }
 
 /* MENSAJE PROXIMAMENTE */
