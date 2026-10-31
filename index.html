@@ -2,217 +2,200 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SHARKTV - Menú Principal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHARKTV</title>
 
 <style>
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  background: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
+    background: #000;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
 
-a, button {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* =================================
-   BANNER PRINCIPAL
-================================= */
+/* BANNER PRINCIPAL */
 
 .header {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  min-height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-color: #000;
-  overflow: hidden;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    transition: background-image 0.8s ease-in-out;
 }
 
-/* Sombra cinematográfica */
+/* SOMBRA LATERAL */
 
 .header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 420px;
-  height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(0,0,0,0.94) 0%,
-    rgba(0,0,0,0.75) 35%,
-    rgba(0,0,0,0) 100%
-  );
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.45s ease;
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.96) 0%,
+        rgba(0,0,0,0.78) 18%,
+        rgba(0,0,0,0.25) 48%,
+        rgba(0,0,0,0.05) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
 }
-
-/* La sombra aparece junto al menú */
 
 .header.menu-visible::before {
-  opacity: 1;
+    opacity: 1;
 }
 
-/* =================================
-   MENÚ LATERAL OCULTO
-================================= */
+/* LOGO SHARKTV */
 
-.header-top {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translate(-110%, -50%);
-  width: 230px;
-  display: flex;
-  flex-direction: column;
-  padding-left: 25px;
-  z-index: 20;
-
-  opacity: 0;
-  visibility: hidden;
-
-  transition:
-    transform 0.45s ease,
-    opacity 0.35s ease,
-    visibility 0.45s;
+.logo-principal {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    max-height: 90px;
+    object-fit: contain;
+    z-index: 5;
 }
 
-/* Mostrar menú */
+/* MENU */
 
-.header.menu-visible .header-top {
-  transform: translate(0, -50%);
-  opacity: 1;
-  visibility: visible;
+.menu-container {
+    position: absolute;
+    top: 50%;
+    left: 65px;
+    transform: translateY(-50%);
+    z-index: 10;
+
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-35px, -50%);
+
+    transition:
+        opacity 0.35s ease,
+        transform 0.35s ease,
+        visibility 0.35s;
 }
 
-/* Opciones */
+.header.menu-visible .menu-container {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%);
+}
+
+/* VENTANA QUE MUESTRA SOLO TRES OPCIONES */
+
+.menu-viewport {
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* LISTA COMPLETA */
 
 .menu {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.3s ease;
+    will-change: transform;
 }
+
+/* OPCIONES */
 
 .menu-item {
-  display: inline-block;
-  width: fit-content;
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 20px;
-  cursor: pointer;
+    width: 280px;
+    height: 42px;
+    flex-shrink: 0;
 
-  text-shadow: 0 0 12px rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
 
-  transition:
-    color 0.25s ease,
-    transform 0.25s ease,
-    text-shadow 0.25s ease;
+    padding: 0 20px;
+
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+
+    color: rgba(255,255,255,0.78);
+
+    border-left: 4px solid transparent;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    transition:
+        color 0.2s,
+        background 0.2s,
+        border-color 0.2s;
 }
 
-/* Selección roja */
+/* OPCION SELECCIONADA */
 
-.menu-item.active,
-.menu-item:focus {
-  color: #E50914;
-  transform: scale(1.15);
-  transform-origin: left center;
-  text-shadow:
-    0 0 8px rgba(229,9,20,0.8),
-    0 0 20px rgba(229,9,20,0.45);
+.menu-item.selected {
+    color: #fff;
+    background: rgba(255,255,255,0.10);
+    border-left: 4px solid #e50914;
+    padding-left: 25px;
+    text-shadow: 0 0 12px rgba(255,255,255,0.3);
 }
 
-/* =================================
-   LOGO
-================================= */
+/* MENSAJE PROXIMAMENTE */
 
-.header-logo {
-  position: absolute;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  width: 90%;
+.aviso {
+    position: absolute;
+    bottom: 125px;
+    left: 50%;
+    transform: translateX(-50%) translateY(15px);
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    background: rgba(20,20,20,0.95);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 12px 25px;
+    border-radius: 5px;
+
+    font-size: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.25s;
+    z-index: 20;
 }
 
-.header-logo img {
-  max-width: 300px;
-  max-height: 180px;
-  width: 100%;
-  object-fit: contain;
-
-  filter: drop-shadow(0 0 15px rgba(0,0,0,0.9));
-
-  transition: opacity 0.8s ease;
+.aviso.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
-/* =================================
-   MÓVILES
-================================= */
+/* MÓVILES */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+    .menu-container {
+        left: 20px;
+    }
 
-  .header::before {
-    width: 300px;
-  }
+    .menu-item {
+        width: 230px;
+        font-size: 19px;
+    }
 
-  .header-top {
-    padding-left: 20px;
-    width: 190px;
-  }
+    .logo-principal {
+        width: 140px;
+        bottom: 25px;
+    }
 
-  .menu-item {
-    font-size: 18px;
-  }
-
-  .header-logo {
-    bottom: 45px;
-  }
-
-  .header-logo img {
-    max-width: 240px;
-    max-height: 140px;
-  }
+    .header {
+        background-position: center center;
+    }
 }
-
-/* =================================
-   ZONA TÁCTIL IZQUIERDA
-================================= */
-
-.touch-zone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 35px;
-  height: 100vh;
-  z-index: 15;
-  background: transparent;
-  display: none;
-}
-
-@media (hover: none) and (pointer: coarse) {
-  .touch-zone {
-    display: block;
-  }
-}
-
 </style>
 </head>
 
@@ -220,407 +203,377 @@ a, button {
 
 <div class="header" id="header">
 
-  <!-- MENÚ -->
+    <div class="menu-container">
 
-  <div class="header-top" id="menu-container">
+        <div class="menu-viewport">
+            <nav class="menu" id="menu">
 
-    <nav class="menu" id="menu">
+                <a class="menu-item selected"
+                   href="https://cristorodriguez13517-maker.github.io/PELICULAS/">
+                    Películas
+                </a>
 
-      <a href="https://cristorodriguez13517-maker.github.io/PELICULAS/"
-         class="menu-item active">
-        Películas
-      </a>
+                <a class="menu-item"
+                   href="https://cristorodriguez13517-maker.github.io/SERIES/">
+                    Series
+                </a>
 
-      <a href="https://cristorodriguez13517-maker.github.io/SERIES/"
-         class="menu-item">
-        Series
-      </a>
+                <a class="menu-item"
+                   href="https://cristorodriguez13517-maker.github.io/KIDS/">
+                    Kids
+                </a>
 
-      <a href="https://cristorodriguez13517-maker.github.io/KIDS/"
-         class="menu-item">
-        Kids
-      </a>
+                <a class="menu-item"
+                   href="#"
+                   data-coming-soon="true">
+                    Colecciones
+                </a>
 
-    </nav>
+                <a class="menu-item"
+                   href="#"
+                   data-coming-soon="true">
+                    Deportes
+                </a>
 
-  </div>
+            </nav>
+        </div>
 
-  <!-- LOGO -->
+    </div>
 
-  <div class="header-logo">
-    <img id="header-logo-img" src="" alt="">
-  </div>
+    <img
+        class="logo-principal"
+        src=""
+        alt="SHARKTV"
+    >
+
+    <div class="aviso" id="aviso">
+        Próximamente
+    </div>
 
 </div>
 
-<!-- ZONA TÁCTIL -->
-
-<div class="touch-zone" id="touch-zone"></div>
-
-
 <script>
 
-/* =========================================
-   ELEMENTOS PRINCIPALES
-========================================= */
+/* =====================================
+   DIRECCIONES DE LOS CATÁLOGOS JSON
+===================================== */
 
-const header = document.getElementById("header");
-const logoImg = document.getElementById("header-logo-img");
-const menuItems = Array.from(
-  document.querySelectorAll(".menu-item")
-);
+const CATALOGOS = [
+    "https://cristorodriguez13517-maker.github.io/PELICULAS/peliculas.json",
 
-const touchZone = document.getElementById("touch-zone");
+    "https://cristorodriguez13517-maker.github.io/SERIES/series.json",
 
-let menuVisible = false;
-let selectedIndex = 0;
-let hideTimer = null;
-
-const HIDE_DELAY = 5000;
-
-
-/* =========================================
-   CATÁLOGOS SHARKTV
-========================================= */
-
-const catalogos = [
-
-  {
-    nombre: "Películas",
-    url: "https://cristorodriguez13517-maker.github.io/PELICULAS/peliculas.json"
-  },
-
-  {
-    nombre: "Series",
-    url: "https://cristorodriguez13517-maker.github.io/SERIES/series.json"
-  },
-
-  {
-    nombre: "Kids",
-    url: "https://cristorodriguez13517-maker.github.io/KIDS/peliculas.json"
-  }
-
+    "https://cristorodriguez13517-maker.github.io/KIDS/peliculas.json"
 ];
 
+
+/* =====================================
+   VARIABLES
+===================================== */
+
+const header = document.getElementById("header");
+const menu = document.getElementById("menu");
+const menuItems = Array.from(
+    document.querySelectorAll(".menu-item")
+);
+
+const aviso = document.getElementById("aviso");
+
 let banners = [];
-let currentIndex = -1;
+let bannerActual = 0;
+
+let selectedIndex = 0;
+let menuVisible = false;
+
+let hideTimer = null;
+let avisoTimer = null;
+
+const HIDE_DELAY = 5000;
+const BANNER_DELAY = 5000;
 
 
-/* =========================================
-   CONVERTIR RUTAS DE IMÁGENES
-========================================= */
+/* =====================================
+   NORMALIZAR IMÁGENES
+===================================== */
 
-function normalizarImagen(url) {
+function normalizarImagen(imagen) {
 
-  if (!url || typeof url !== "string") {
-    return "";
-  }
-
-  url = url.trim();
-
-  if (
-    !url ||
-    url === "null" ||
-    url === "undefined"
-  ) {
-    return "";
-  }
-
-  if (
-    url.startsWith("http://") ||
-    url.startsWith("https://")
-  ) {
-    return url;
-  }
-
-  if (url.startsWith("/")) {
-    return "https://image.tmdb.org/t/p/original" + url;
-  }
-
-  return "";
-}
-
-
-/* =========================================
-   EXTRAER REGISTROS JSON
-========================================= */
-
-function extraerRegistros(data) {
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (data && typeof data === "object") {
-
-    if (Array.isArray(data.peliculas)) return data.peliculas;
-    if (Array.isArray(data.series)) return data.series;
-    if (Array.isArray(data.results)) return data.results;
-    if (Array.isArray(data.items)) return data.items;
-
-    if (data.backdrop || data.logo) {
-      return [data];
+    if (!imagen || typeof imagen !== "string") {
+        return "";
     }
 
-    return Object.values(data).filter(item =>
-      item && typeof item === "object"
-    );
-  }
+    imagen = imagen.trim();
 
-  return [];
+    if (!imagen) {
+        return "";
+    }
+
+    if (
+        imagen.startsWith("https://") ||
+        imagen.startsWith("http://")
+    ) {
+        return imagen;
+    }
+
+    if (imagen.startsWith("/")) {
+        return "https://image.tmdb.org/t/p/original" + imagen;
+    }
+
+    return imagen;
 }
 
 
-/* =========================================
-   FECHA DE PUBLICACIÓN
-========================================= */
+/* =====================================
+   EXTRAER REGISTROS JSON
+===================================== */
+
+function extraerRegistros(datos) {
+
+    if (Array.isArray(datos)) {
+        return datos;
+    }
+
+    if (datos && typeof datos === "object") {
+
+        for (const clave of [
+            "results",
+            "peliculas",
+            "series",
+            "items",
+            "catalogo"
+        ]) {
+            if (Array.isArray(datos[clave])) {
+                return datos[clave];
+            }
+        }
+
+        return Object.values(datos).filter(
+            elemento =>
+                elemento &&
+                typeof elemento === "object" &&
+                !Array.isArray(elemento)
+        );
+    }
+
+    return [];
+}
+
+
+/* =====================================
+   OBTENER FECHA
+===================================== */
 
 function obtenerFecha(item) {
 
-  const fechas = [
-    item.published_at,
-    item.release_date,
-    item.first_air_date,
-    item.date,
-    item.created_at
-  ];
+    const fecha =
+        item.published_at ||
+        item.release_date ||
+        item.first_air_date ||
+        item.date ||
+        item.created_at ||
+        "";
 
-  for (const fecha of fechas) {
+    const valor = new Date(fecha).getTime();
 
-    if (!fecha) continue;
-
-    const timestamp = Date.parse(fecha);
-
-    if (!isNaN(timestamp)) {
-      return timestamp;
-    }
-  }
-
-  return 0;
+    return Number.isFinite(valor) ? valor : 0;
 }
 
 
-/* =========================================
+/* =====================================
    CARGAR CATÁLOGOS
-========================================= */
+===================================== */
 
-async function cargarCatalogo(catalogo) {
+async function cargarCatalogo(url) {
 
-  try {
+    try {
 
-    const respuesta = await fetch(
-      catalogo.url + "?v=" + Date.now(),
-      { cache: "no-store" }
-    );
+        const respuesta = await fetch(
+            url + "?t=" + Date.now(),
+            { cache: "no-store" }
+        );
 
-    if (!respuesta.ok) {
-      throw new Error("HTTP " + respuesta.status);
+        if (!respuesta.ok) {
+            throw new Error("Error HTTP " + respuesta.status);
+        }
+
+        const datos = await respuesta.json();
+
+        return extraerRegistros(datos);
+
+    } catch (error) {
+
+        console.error("No se pudo cargar:", url, error);
+
+        return [];
     }
+}
 
-    const data = await respuesta.json();
 
-    const registros = extraerRegistros(data);
+/* =====================================
+   ELIMINAR BANNERS REPETIDOS
+===================================== */
 
-    const elementos = registros.map(item => {
+function eliminarDuplicados(lista) {
 
-      return {
+    const vistos = new Set();
 
-        backdrop: normalizarImagen(
-          item.backdrop ||
-          item.backdrop_path ||
-          item.banner
-        ),
+    return lista.filter(item => {
 
-        logo: normalizarImagen(
-          item.logo ||
-          item.logo_path ||
-          item.logo_url
-        ),
+        const clave =
+            item.backdrop ||
+            item.youtube_id ||
+            item.tmdb_id ||
+            item.id;
 
-        fecha: obtenerFecha(item),
+        if (!clave || vistos.has(clave)) {
+            return false;
+        }
 
-        catalogo: catalogo.nombre
+        vistos.add(clave);
 
-      };
-
-    }).filter(item => {
-
-      return item.backdrop && item.logo;
-
+        return true;
     });
-
-    console.log(
-      catalogo.nombre + ": " +
-      elementos.length + " contenidos"
-    );
-
-    return elementos;
-
-  } catch (error) {
-
-    console.error(
-      "Error cargando " + catalogo.nombre,
-      error
-    );
-
-    return [];
-  }
 }
 
 
-/* =========================================
-   ELIMINAR DUPLICADOS
-========================================= */
-
-function eliminarDuplicados(elementos) {
-
-  const vistos = new Set();
-
-  return elementos.filter(item => {
-
-    const clave = item.backdrop + "|" + item.logo;
-
-    if (vistos.has(clave)) {
-      return false;
-    }
-
-    vistos.add(clave);
-
-    return true;
-  });
-}
-
-
-/* =========================================
+/* =====================================
    PRECARGAR IMÁGENES
-========================================= */
+===================================== */
 
-function precargarImagen(src) {
+function precargarImagen(url) {
 
-  return new Promise(resolve => {
+    return new Promise(resolve => {
 
-    const img = new Image();
+        const imagen = new Image();
 
-    img.onload = () => resolve(true);
+        imagen.onload = () => resolve(true);
+        imagen.onerror = () => resolve(false);
 
-    img.onerror = () => resolve(false);
-
-    img.src = src;
-
-  });
+        imagen.src = url;
+    });
 }
 
 
-/* =========================================
-   CAMBIAR BANNER
-========================================= */
-
-let slideEnCurso = false;
+/* =====================================
+   MOSTRAR BANNER
+===================================== */
 
 async function cambiarSlide() {
 
-  if (!banners.length || slideEnCurso) return;
-
-  slideEnCurso = true;
-
-  const total = banners.length;
-
-  let intentos = 0;
-  let elemento = null;
-  let imagenesCorrectas = false;
-
-  while (intentos < total) {
-
-    currentIndex++;
-
-    if (currentIndex >= total) {
-      currentIndex = 0;
+    if (!banners.length) {
+        return;
     }
 
-    elemento = banners[currentIndex];
+    const item = banners[bannerActual];
 
-    const resultados = await Promise.all([
-      precargarImagen(elemento.backdrop),
-      precargarImagen(elemento.logo)
-    ]);
-
-    if (resultados[0] && resultados[1]) {
-      imagenesCorrectas = true;
-      break;
-    }
-
-    intentos++;
-  }
-
-  if (imagenesCorrectas && elemento) {
+    const fondo = item.backdrop;
+    const logo = item.logo;
 
     header.style.backgroundImage =
-      `url("${elemento.backdrop}")`;
+        `url("${fondo}")`;
 
-    logoImg.style.opacity = 0;
+    const logoPrincipal =
+        document.querySelector(".logo-principal");
 
-    setTimeout(() => {
+    logoPrincipal.src = logo;
 
-      logoImg.src = elemento.logo;
-      logoImg.style.opacity = 1;
+    bannerActual++;
 
-    }, 300);
-
-  }
-
-  slideEnCurso = false;
+    if (bannerActual >= banners.length) {
+        bannerActual = 0;
+    }
 }
 
 
-/* =========================================
+/* =====================================
    INICIAR CARRUSEL
-========================================= */
+===================================== */
 
 async function iniciarSharkTV() {
 
-  console.log("Cargando novedades SHARKTV...");
-
-  const resultados = await Promise.all(
-    catalogos.map(cargarCatalogo)
-  );
-
-  banners = resultados.flat();
-
-  banners = eliminarDuplicados(banners);
-
-  /* Más recientes primero */
-
-  banners.sort((a, b) => b.fecha - a.fecha);
-
-  console.log(
-    "Total de banners encontrados: " + banners.length
-  );
-
-  if (!banners.length) {
-
-    console.error(
-      "No se encontraron contenidos con banner y logo."
+    const resultados = await Promise.all(
+        CATALOGOS.map(url => cargarCatalogo(url))
     );
 
-    return;
-  }
+    let todos = resultados.flat();
 
-  currentIndex = -1;
+    todos = todos.map(item => {
 
-  cambiarSlide();
+        return {
+            ...item,
+            backdrop: normalizarImagen(item.backdrop),
+            logo: normalizarImagen(item.logo),
+            fecha: obtenerFecha(item)
+        };
 
-  setInterval(cambiarSlide, 5000);
+    });
 
+    todos = todos.filter(item =>
+        item.backdrop && item.logo
+    );
+
+    todos = eliminarDuplicados(todos);
+
+    todos.sort((a, b) => b.fecha - a.fecha);
+
+    banners = todos;
+
+    console.log(
+        "Banners cargados en SHARKTV:",
+        banners.length
+    );
+
+    if (!banners.length) {
+
+        console.warn(
+            "No se encontraron registros con backdrop y logo."
+        );
+
+        return;
+    }
+
+    // Precargar el primer banner
+    await precargarImagen(banners[0].backdrop);
+
+    cambiarSlide();
+
+    setInterval(cambiarSlide, BANNER_DELAY);
 }
 
 
-/* =========================================
-   MOSTRAR MENÚ
-========================================= */
+/* =====================================
+   CONTROL DEL MENÚ
+===================================== */
+
+function actualizarSeleccion() {
+
+    menuItems.forEach((item, index) => {
+
+        item.classList.toggle(
+            "selected",
+            index === selectedIndex
+        );
+
+    });
+
+    // Mostrar únicamente tres opciones a la vez
+    const maxInicio = Math.max(0, menuItems.length - 3);
+
+    const inicio = Math.min(
+        Math.max(0, selectedIndex - 2),
+        maxInicio
+    );
+
+    const alturaItem = 42;
+    const espacio = 12;
+    const desplazamiento = inicio * (alturaItem + espacio);
+
+    menu.style.transform =
+        `translateY(-${desplazamiento}px)`;
+}
+
 
 function mostrarMenu() {
-
-  if (!menuVisible) {
 
     menuVisible = true;
 
@@ -628,239 +581,234 @@ function mostrarMenu() {
 
     actualizarSeleccion();
 
-  }
-
-  reiniciarTemporizador();
+    reiniciarTemporizador();
 }
 
-
-/* =========================================
-   OCULTAR MENÚ
-========================================= */
 
 function ocultarMenu() {
 
-  menuVisible = false;
+    menuVisible = false;
 
-  header.classList.remove("menu-visible");
+    header.classList.remove("menu-visible");
 
-  clearTimeout(hideTimer);
-
+    clearTimeout(hideTimer);
 }
 
-
-/* =========================================
-   TEMPORIZADOR DE OCULTACIÓN
-========================================= */
 
 function reiniciarTemporizador() {
 
-  clearTimeout(hideTimer);
+    clearTimeout(hideTimer);
 
-  hideTimer = setTimeout(() => {
+    hideTimer = setTimeout(() => {
 
-    ocultarMenu();
+        ocultarMenu();
 
-  }, HIDE_DELAY);
-
+    }, HIDE_DELAY);
 }
 
 
-/* =========================================
-   ACTUALIZAR OPCIÓN SELECCIONADA
-========================================= */
+/* =====================================
+   AVISO DE APARTADO PRÓXIMAMENTE
+===================================== */
 
-function actualizarSeleccion() {
+function mostrarAviso() {
 
-  menuItems.forEach((item, index) => {
+    aviso.classList.add("visible");
 
-    item.classList.toggle(
-      "active",
-      index === selectedIndex
-    );
+    clearTimeout(avisoTimer);
 
-  });
+    avisoTimer = setTimeout(() => {
 
+        aviso.classList.remove("visible");
+
+    }, 1800);
 }
 
 
-/* =========================================
-   MOVER SELECCIÓN
-========================================= */
+/* =====================================
+   ABRIR OPCIÓN SELECCIONADA
+===================================== */
 
-function moverSeleccion(direccion) {
+function abrirSeleccion() {
 
-  mostrarMenu();
+    const item = menuItems[selectedIndex];
 
-  selectedIndex += direccion;
+    if (!item) {
+        return;
+    }
 
-  if (selectedIndex < 0) {
-    selectedIndex = menuItems.length - 1;
-  }
+    if (item.dataset.comingSoon === "true") {
 
-  if (selectedIndex >= menuItems.length) {
-    selectedIndex = 0;
-  }
+        mostrarAviso();
 
-  actualizarSeleccion();
+        reiniciarTemporizador();
 
+        return;
+    }
+
+    const destino = item.getAttribute("href");
+
+    if (destino && destino !== "#") {
+        window.location.href = destino;
+    }
 }
 
 
-/* =========================================
-   ENTRAR EN SECCIÓN
-========================================= */
-
-function entrarSeccion() {
-
-  if (!menuVisible) {
-    mostrarMenu();
-    return;
-  }
-
-  const enlace = menuItems[selectedIndex];
-
-  if (enlace) {
-    window.location.href = enlace.href;
-  }
-
-}
-
-
-/* =========================================
+/* =====================================
    NAVEGACIÓN CON MANDO
-========================================= */
+===================================== */
 
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function(event) {
 
-  const tecla = e.key;
+    const tecla = event.key;
 
-  if (
-    tecla === "ArrowDown" ||
-    tecla === "ArrowUp" ||
-    tecla === "ArrowLeft" ||
-    tecla === "ArrowRight"
-  ) {
+    if ([
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "Enter",
+        "Escape",
+        "Backspace"
+    ].includes(tecla)) {
 
-    e.preventDefault();
+        event.preventDefault();
+    }
 
+    // Abrir el menú si está oculto
     if (!menuVisible) {
 
-      mostrarMenu();
+        if (
+            tecla === "ArrowUp" ||
+            tecla === "ArrowDown" ||
+            tecla === "ArrowLeft" ||
+            tecla === "ArrowRight"
+        ) {
 
-      if (tecla === "ArrowDown") {
-        selectedIndex = 0;
-      }
+            mostrarMenu();
 
-      if (tecla === "ArrowUp") {
-        selectedIndex = menuItems.length - 1;
-      }
+            return;
+        }
 
-      actualizarSeleccion();
-
-      return;
+        return;
     }
 
+    // Navegar hacia abajo
     if (tecla === "ArrowDown") {
-      moverSeleccion(1);
+
+        selectedIndex++;
+
+        if (selectedIndex >= menuItems.length) {
+            selectedIndex = menuItems.length - 1;
+        }
+
+        actualizarSeleccion();
+
+        reiniciarTemporizador();
     }
 
+    // Navegar hacia arriba
     if (tecla === "ArrowUp") {
-      moverSeleccion(-1);
+
+        selectedIndex--;
+
+        if (selectedIndex < 0) {
+            selectedIndex = 0;
+        }
+
+        actualizarSeleccion();
+
+        reiniciarTemporizador();
     }
 
-    reiniciarTemporizador();
+    // Seleccionar
+    if (tecla === "Enter") {
 
-  }
+        abrirSeleccion();
+    }
 
-  /* Botón OK / ENTER */
+    // Ocultar menú
+    if (
+        tecla === "Escape" ||
+        tecla === "Backspace"
+    ) {
 
-  if (
-    tecla === "Enter" ||
-    tecla === " "
-  ) {
+        ocultarMenu();
+    }
 
-    e.preventDefault();
+    // Mantener visible al pulsar izquierda/derecha
+    if (
+        tecla === "ArrowLeft" ||
+        tecla === "ArrowRight"
+    ) {
 
-    entrarSeccion();
-
-  }
-
-  /* Botón ATRÁS / ESC */
-
-  if (
-    tecla === "Escape" ||
-    tecla === "Backspace"
-  ) {
-
-    ocultarMenu();
-
-  }
+        reiniciarTemporizador();
+    }
 
 });
 
 
-/* =========================================
-   NAVEGACIÓN CON RATÓN
-========================================= */
+/* =====================================
+   NAVEGACIÓN CON RATÓN O PANTALLA TÁCTIL
+===================================== */
 
 menuItems.forEach((item, index) => {
 
-  item.addEventListener("mouseenter", () => {
+    item.addEventListener("mouseenter", () => {
 
-    selectedIndex = index;
+        selectedIndex = index;
 
-    mostrarMenu();
+        actualizarSeleccion();
 
-    actualizarSeleccion();
+        mostrarMenu();
+    });
 
-  });
+    item.addEventListener("click", event => {
 
-  item.addEventListener("click", () => {
+        if (item.dataset.comingSoon === "true") {
 
-    selectedIndex = index;
+            event.preventDefault();
 
-    actualizarSeleccion();
+            selectedIndex = index;
 
-  });
+            actualizarSeleccion();
 
-});
+            mostrarMenu();
 
+            mostrarAviso();
+        }
 
-/* =========================================
-   ZONA TÁCTIL MÓVIL
-========================================= */
-
-touchZone.addEventListener("click", () => {
-
-  if (menuVisible) {
-
-    ocultarMenu();
-
-  } else {
-
-    mostrarMenu();
-
-  }
+    });
 
 });
 
 
-/* =========================================
-   TOCAR MENÚ
-========================================= */
+/* =====================================
+   ZONA TÁCTIL DEL BORDE IZQUIERDO
+===================================== */
 
-document.getElementById("menu-container")
-  .addEventListener("touchstart", () => {
+document.addEventListener("touchstart", function(event) {
 
-    reiniciarTemporizador();
+    const toque = event.touches[0];
 
-  }, { passive: true });
+    if (toque.clientX < 35) {
+
+        if (menuVisible) {
+            ocultarMenu();
+        } else {
+            mostrarMenu();
+        }
+
+    }
+
+}, { passive: true });
 
 
-/* =========================================
-   INICIO SHARKTV
-========================================= */
+/* =====================================
+   INICIO
+===================================== */
+
+actualizarSeleccion();
 
 iniciarSharkTV();
 
