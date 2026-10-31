@@ -134,16 +134,30 @@ a, button {
     text-shadow 0.25s ease;
 }
 
-/* Selección roja */
+/* Selección: solo se ilumina el texto, nunca aparece un recuadro */
+
+.menu-item,
+.menu-item:hover,
+.menu-item:focus,
+.menu-item:focus-visible,
+.menu-item:active,
+.menu-item.active {
+  background: transparent !important;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
 
 .menu-item.active,
-.menu-item:focus {
-  color: #E50914;
-  transform: scale(1.15);
+.menu-item:focus,
+.menu-item:focus-visible {
+  color: #ff3038;
+  transform: scale(1.08);
   transform-origin: left center;
-  text-shadow:
-    0 0 8px rgba(229,9,20,0.8),
-    0 0 20px rgba(229,9,20,0.45);
+  /* Luminosidad suave: destaca sin difuminar las letras */
+  text-shadow: 0 0 2px rgba(229,9,20,0.45);
 }
 
 /* =================================
