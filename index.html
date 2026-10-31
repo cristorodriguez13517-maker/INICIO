@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SHARKTV - Menú</title>
+<title>SHARKTV - Menú Principal</title>
 
 <style>
 * {
@@ -31,7 +31,7 @@ a:focus-visible {
   background: transparent;
 }
 
-/* Banner principal */
+/* BANNER PRINCIPAL */
 .header {
   position: relative;
   width: 100%;
@@ -44,7 +44,7 @@ a:focus-visible {
   overflow: hidden;
 }
 
-/* Sombra lateral */
+/* SOMBRA LATERAL */
 .header::before {
   content: '';
   position: absolute;
@@ -62,7 +62,7 @@ a:focus-visible {
   pointer-events: none;
 }
 
-/* Menú lateral */
+/* MENÚ LATERAL */
 .header-top {
   position: absolute;
   top: 50%;
@@ -99,7 +99,7 @@ a:focus-visible {
   transform: scale(1.1);
 }
 
-/* Logo inferior centrado */
+/* LOGO INFERIOR */
 .header-logo {
   position: absolute;
   bottom: 60px;
@@ -121,7 +121,6 @@ a:focus-visible {
   transition: opacity 0.8s ease;
 }
 
-/* Adaptación a pantallas pequeñas */
 @media (max-width: 600px) {
   .header::before {
     width: 280px;
@@ -172,12 +171,16 @@ a:focus-visible {
 </div>
 
 <script>
-const header = document.getElementById('header');
-const logoImg = document.getElementById('header-logo-img');
 
 /* =========================================
-   CATÁLOGOS SHARKTV
-   No se necesitan API keys en este HTML.
+   ELEMENTOS PRINCIPALES
+========================================= */
+
+const header = document.getElementById("header");
+const logoImg = document.getElementById("header-logo-img");
+
+/* =========================================
+   REPOSITORIOS SHARKTV
 ========================================= */
 
 const catalogos = [
@@ -195,63 +198,70 @@ const catalogos = [
   }
 ];
 
-/* Banners recopilados desde los JSON */
+/* =========================================
+   CONFIGURACIÓN DEL CARRUSEL
+========================================= */
+
 let banners = [];
 let currentIndex = -1;
 
-/* Evita repetir la misma imagen consecutivamente */
-function getRandomIndex() {
-  if (banners.length <= 1) return 0;
+const INTERVALO = 5000;
 
-  let newIndex;
+/* =========================================
+   CONVERTIR RUTAS DE IMÁGENES
+========================================= */
 
-  do {
-    newIndex = Math.floor(Math.random() * banners.length);
-  } while (newIndex === currentIndex);
+function normalizarImagen(url) {
 
-  return newIndex;
-}
-
-/* Convierte una ruta TMDB en URL completa */
-function normalizarImagen(url, tipo) {
-  if (!url || typeof url !== "string") return "";
-
-  url = url.trim();
-
-  if (!url || url === "null" || url === "undefined") {
+  if (!url || typeof url !== "string") {
     return "";
   }
 
-  if (url.startsWith("http://") || url.startsWith("https://")) {
+  url = url.trim();
+
+  if (
+    !url ||
+    url === "null" ||
+    url === "undefined"
+  ) {
+    return "";
+  }
+
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://")
+  ) {
     return url;
   }
 
   if (url.startsWith("/")) {
-    const tamaño = tipo === "logo" ? "original" : "original";
-    return `https://image.tmdb.org/t/p/${tamaño}${url}`;
+    return "https://image.tmdb.org/t/p/original" + url;
   }
 
-  return url;
+  return "";
 }
 
-/* Extrae registros aunque el JSON tenga distintas estructuras */
+/* =========================================
+   LEER REGISTROS JSON
+========================================= */
+
 function extraerRegistros(data) {
+
   if (Array.isArray(data)) {
     return data;
   }
 
   if (data && typeof data === "object") {
+
     if (Array.isArray(data.peliculas)) return data.peliculas;
     if (Array.isArray(data.series)) return data.series;
     if (Array.isArray(data.results)) return data.results;
     if (Array.isArray(data.items)) return data.items;
 
-    /* Si es un objeto individual */
     if (data.backdrop || data.logo) {
       return [data];
     }
 
-    /* Por si el JSON organiza elementos por claves */
     return Object.values(data).filter(item =>
       item && typeof item === "object"
     );
@@ -260,154 +270,267 @@ function extraerRegistros(data) {
   return [];
 }
 
-/* Carga un catálogo */
+/* =========================================
+   OBTENER FECHA DE PUBLICACIÓN
+========================================= */
+
+function obtenerFecha(item) {
+
+  const posiblesFechas = [
+    item.published_at,
+    item.release_date,
+    item.first_air_date,
+    item.date,
+    item.created_at
+  ];
+
+  for (const fecha of posiblesFechas) {
+
+    if (!fecha) continue;
+
+    const timestamp = Date.parse(fecha);
+
+    if (!isNaN(timestamp)) {
+      return timestamp;
+    }
+  }
+
+  return 0;
+}
+
+/* =========================================
+   CARGAR CADA REPOSITORIO
+========================================= */
+
 async function cargarCatalogo(catalogo) {
+
   try {
-    const respuesta = await fetch(catalogo.url, {
-      cache: "no-store"
-    });
+
+    const respuesta = await fetch(
+      catalogo.url + "?v=" + Date.now(),
+      { cache: "no-store" }
+    );
 
     if (!respuesta.ok) {
       throw new Error("HTTP " + respuesta.status);
     }
 
     const data = await respuesta.json();
+
     const registros = extraerRegistros(data);
 
-    const elementos = registros
-      .map(item => {
-        const backdrop = normalizarImagen(
-          item.backdrop || item.backdrop_path || item.banner,
-          "backdrop"
-        );
+    const elementos = registros.map(item => {
 
-        const logo = normalizarImagen(
-          item.logo || item.logo_path || item.logo_url,
-          "logo"
-        );
+      const backdrop = normalizarImagen(
+        item.backdrop || item.backdrop_path || item.banner
+      );
 
-        return {
-          backdrop,
-          logo,
-          catalogo: catalogo.nombre
-        };
-      })
-      /* Solo elementos con banner y logo */
-      .filter(item => item.backdrop && item.logo);
+      const logo = normalizarImagen(
+        item.logo || item.logo_path || item.logo_url
+      );
+
+      return {
+        backdrop: backdrop,
+        logo: logo,
+        fecha: obtenerFecha(item),
+        catalogo: catalogo.nombre
+      };
+
+    }).filter(item => {
+
+      return item.backdrop && item.logo;
+
+    });
 
     console.log(
-      catalogo.nombre + ": " + elementos.length + " banners encontrados"
+      catalogo.nombre + ": " +
+      elementos.length + " contenidos disponibles"
     );
 
     return elementos;
 
   } catch (error) {
-    console.warn(
-      "No se pudo cargar el catálogo " + catalogo.nombre,
+
+    console.error(
+      "Error cargando " + catalogo.nombre,
       error
     );
+
     return [];
   }
 }
 
-/* Precarga una imagen */
-function precargarImagen(src) {
-  return new Promise(resolve => {
-    const img = new Image();
+/* =========================================
+   ELIMINAR DUPLICADOS
+========================================= */
 
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
+function eliminarDuplicados(elementos) {
 
-    img.src = src;
+  const vistos = new Set();
+
+  return elementos.filter(item => {
+
+    const clave = item.backdrop + "|" + item.logo;
+
+    if (vistos.has(clave)) {
+      return false;
+    }
+
+    vistos.add(clave);
+
+    return true;
   });
 }
 
-/* Cambia el banner y su logo */
+/* =========================================
+   PRECARGAR IMÁGENES
+========================================= */
+
+function precargarImagen(src) {
+
+  return new Promise(resolve => {
+
+    const img = new Image();
+
+    img.onload = () => resolve(true);
+
+    img.onerror = () => resolve(false);
+
+    img.src = src;
+
+  });
+}
+
+/* =========================================
+   CAMBIAR BANNER
+========================================= */
+
 async function cambiarSlide() {
+
   if (!banners.length) return;
 
-  currentIndex = getRandomIndex();
+  currentIndex++;
+
+  if (currentIndex >= banners.length) {
+    currentIndex = 0;
+  }
 
   const elemento = banners[currentIndex];
 
-  /* Precarga antes de mostrar */
-  await Promise.all([
+  /* Precargar las imágenes */
+
+  const resultados = await Promise.all([
     precargarImagen(elemento.backdrop),
     precargarImagen(elemento.logo)
   ]);
 
+  /* Si falla alguna imagen, pasar al siguiente */
+
+  if (!resultados[0] || !resultados[1]) {
+
+    console.warn(
+      "Imagen no disponible. Pasando al siguiente banner."
+    );
+
+    if (banners.length > 1) {
+      cambiarSlide();
+    }
+
+    return;
+  }
+
+  /* Cambiar fondo */
+
   header.style.backgroundImage =
     `url("${elemento.backdrop}")`;
+
+  /* Efecto del logo */
 
   logoImg.style.opacity = 0;
 
   setTimeout(() => {
+
     logoImg.src = elemento.logo;
+
     logoImg.style.opacity = 1;
+
   }, 300);
+
 }
 
-/* Mezcla los banners para que salgan en orden aleatorio */
-function mezclar(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+/* =========================================
+   INICIAR SHARKTV
+========================================= */
 
-/* Inicia la carga de los tres repositorios */
 async function iniciarSharkTV() {
+
+  console.log("Cargando catálogos SHARKTV...");
+
   const resultados = await Promise.all(
     catalogos.map(cargarCatalogo)
   );
 
+  /* Unir películas, series y Kids */
+
   banners = resultados.flat();
 
-  /* Elimina duplicados por combinación banner/logo */
-  const vistos = new Set();
+  /* Eliminar imágenes repetidas */
 
-  banners = banners.filter(item => {
-    const clave = item.backdrop + "|" + item.logo;
+  banners = eliminarDuplicados(banners);
 
-    if (vistos.has(clave)) return false;
+  /* Ordenar por fecha más reciente */
 
-    vistos.add(clave);
-    return true;
-  });
+  banners.sort((a, b) => b.fecha - a.fecha);
+
+  console.log(
+    "Total de banners encontrados: " + banners.length
+  );
 
   if (!banners.length) {
+
     console.error(
-      "No se encontraron elementos con backdrop y logo en los JSON."
+      "No se encontraron banners con logo en los catálogos."
     );
+
     return;
   }
 
-  mezclar(banners);
+  /* Mostrar primero las novedades */
 
-  console.log("Total de banners cargados:", banners.length);
+  currentIndex = -1;
 
   cambiarSlide();
 
-  /* Cambia cada 5 segundos */
-  setInterval(cambiarSlide, 5000);
+  /* Cambio automático cada 5 segundos */
+
+  setInterval(cambiarSlide, INTERVALO);
+
 }
 
-/* Menú */
-const menuItems = document.querySelectorAll('.menu-item');
+/* =========================================
+   EFECTOS DEL MENÚ
+========================================= */
+
+const menuItems = document.querySelectorAll(".menu-item");
 
 menuItems.forEach(item => {
-  item.addEventListener('mouseenter', () => {
-    item.classList.add('active');
+
+  item.addEventListener("mouseenter", () => {
+    item.classList.add("active");
   });
 
-  item.addEventListener('mouseleave', () => {
-    item.classList.remove('active');
+  item.addEventListener("mouseleave", () => {
+    item.classList.remove("active");
   });
+
 });
 
-/* Arranque */
+/* =========================================
+   ARRANCAR
+========================================= */
+
 iniciarSharkTV();
+
 </script>
 
 </body>
