@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHARKTV - Menú</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+}
+
+a, button {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus,
+a:active,
+a:focus-visible {
+  outline: none;
+  background: transparent;
+}
+
+/* Banner principal */
+.header {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-color: #000;
+  transition: background-image 1s ease-in-out;
+  overflow: hidden;
+}
+
+/* Sombra lateral */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 380px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.90) 0%,
+    rgba(0,0,0,0.75) 30%,
+    rgba(0,0,0,0) 75%
+  );
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Menú lateral */
+.header-top {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-left: 20px;
+  z-index: 10;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.menu-item {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  transition: color 0.2s, transform 0.2s;
+  cursor: pointer;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9);
+}
+
+.menu-item:hover,
+.menu-item:focus,
+.menu-item.active {
+  color: #E50914;
+  transform: scale(1.1);
+}
+
+/* Logo inferior centrado */
+.header-logo {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-logo img {
+  max-width: 300px;
+  max-height: 180px;
+  width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(0,0,0,0.9));
+  transition: opacity 0.8s ease;
+}
+
+/* Adaptación a pantallas pequeñas */
+@media (max-width: 600px) {
+  .header::before {
+    width: 280px;
+  }
+
+  .header-top {
+    padding-left: 18px;
+    width: 170px;
+  }
+
+  .menu-item {
+    font-size: 17px;
+  }
+
+  .header-logo {
+    bottom: 45px;
+  }
+
+  .header-logo img {
+    max-width: 240px;
+    max-height: 140px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header" id="header">
+
+  <div class="header-top">
+    <nav class="menu">
+      <a href="https://cristorodriguez13517-maker.github.io/PELICULAS/"
+         class="menu-item">Películas</a>
+
+      <a href="https://cristorodriguez13517-maker.github.io/SERIES/"
+         class="menu-item">Series</a>
+
+      <a href="https://cristorodriguez13517-maker.github.io/KIDS/"
+         class="menu-item">Kids</a>
+    </nav>
+  </div>
+
+  <div class="header-logo">
+    <img id="header-logo-img" src="" alt="">
+  </div>
+
+</div>
+
+<script>
+const header = document.getElementById('header');
+const logoImg = document.getElementById('header-logo-img');
+
+/* =========================================
+   CATÁLOGOS SHARKTV
+   No se necesitan API keys en este HTML.
+========================================= */
+
+const catalogos = [
+  {
+    nombre: "Películas",
+    url: "https://cristorodriguez13517-maker.github.io/PELICULAS/peliculas.json"
+  },
+  {
+    nombre: "Series",
+    url: "https://cristorodriguez13517-maker.github.io/SERIES/series.json"
+  },
+  {
+    nombre: "Kids",
+    url: "https://cristorodriguez13517-maker.github.io/KIDS/peliculas.json"
+  }
+];
+
+/* Banners recopilados desde los JSON */
+let banners = [];
+let currentIndex = -1;
+
+/* Evita repetir la misma imagen consecutivamente */
+function getRandomIndex() {
+  if (banners.length <= 1) return 0;
+
+  let newIndex;
+
+  do {
+    newIndex = Math.floor(Math.random() * banners.length);
+  } while (newIndex === currentIndex);
+
+  return newIndex;
+}
+
+/* Convierte una ruta TMDB en URL completa */
+function normalizarImagen(url, tipo) {
+  if (!url || typeof url !== "string") return "";
+
+  url = url.trim();
+
+  if (!url || url === "null" || url === "undefined") {
+    return "";
+  }
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  if (url.startsWith("/")) {
+    const tamaño = tipo === "logo" ? "original" : "original";
+    return `https://image.tmdb.org/t/p/${tamaño}${url}`;
+  }
+
+  return url;
+}
+
+/* Extrae registros aunque el JSON tenga distintas estructuras */
+function extraerRegistros(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (data && typeof data === "object") {
+    if (Array.isArray(data.peliculas)) return data.peliculas;
+    if (Array.isArray(data.series)) return data.series;
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.items)) return data.items;
+
+    /* Si es un objeto individual */
+    if (data.backdrop || data.logo) {
+      return [data];
+    }
+
+    /* Por si el JSON organiza elementos por claves */
+    return Object.values(data).filter(item =>
+      item && typeof item === "object"
+    );
+  }
+
+  return [];
+}
+
+/* Carga un catálogo */
+async function cargarCatalogo(catalogo) {
+  try {
+    const respuesta = await fetch(catalogo.url, {
+      cache: "no-store"
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("HTTP " + respuesta.status);
+    }
+
+    const data = await respuesta.json();
+    const registros = extraerRegistros(data);
+
+    const elementos = registros
+      .map(item => {
+        const backdrop = normalizarImagen(
+          item.backdrop || item.backdrop_path || item.banner,
+          "backdrop"
+        );
+
+        const logo = normalizarImagen(
+          item.logo || item.logo_path || item.logo_url,
+          "logo"
+        );
+
+        return {
+          backdrop,
+          logo,
+          catalogo: catalogo.nombre
+        };
+      })
+      /* Solo elementos con banner y logo */
+      .filter(item => item.backdrop && item.logo);
+
+    console.log(
+      catalogo.nombre + ": " + elementos.length + " banners encontrados"
+    );
+
+    return elementos;
+
+  } catch (error) {
+    console.warn(
+      "No se pudo cargar el catálogo " + catalogo.nombre,
+      error
+    );
+    return [];
+  }
+}
+
+/* Precarga una imagen */
+function precargarImagen(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+
+    img.src = src;
+  });
+}
+
+/* Cambia el banner y su logo */
+async function cambiarSlide() {
+  if (!banners.length) return;
+
+  currentIndex = getRandomIndex();
+
+  const elemento = banners[currentIndex];
+
+  /* Precarga antes de mostrar */
+  await Promise.all([
+    precargarImagen(elemento.backdrop),
+    precargarImagen(elemento.logo)
+  ]);
+
+  header.style.backgroundImage =
+    `url("${elemento.backdrop}")`;
+
+  logoImg.style.opacity = 0;
+
+  setTimeout(() => {
+    logoImg.src = elemento.logo;
+    logoImg.style.opacity = 1;
+  }, 300);
+}
+
+/* Mezcla los banners para que salgan en orden aleatorio */
+function mezclar(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/* Inicia la carga de los tres repositorios */
+async function iniciarSharkTV() {
+  const resultados = await Promise.all(
+    catalogos.map(cargarCatalogo)
+  );
+
+  banners = resultados.flat();
+
+  /* Elimina duplicados por combinación banner/logo */
+  const vistos = new Set();
+
+  banners = banners.filter(item => {
+    const clave = item.backdrop + "|" + item.logo;
+
+    if (vistos.has(clave)) return false;
+
+    vistos.add(clave);
+    return true;
+  });
+
+  if (!banners.length) {
+    console.error(
+      "No se encontraron elementos con backdrop y logo en los JSON."
+    );
+    return;
+  }
+
+  mezclar(banners);
+
+  console.log("Total de banners cargados:", banners.length);
+
+  cambiarSlide();
+
+  /* Cambia cada 5 segundos */
+  setInterval(cambiarSlide, 5000);
+}
+
+/* Menú */
+const menuItems = document.querySelectorAll('.menu-item');
+
+menuItems.forEach(item => {
+  item.addEventListener('mouseenter', () => {
+    item.classList.add('active');
+  });
+
+  item.addEventListener('mouseleave', () => {
+    item.classList.remove('active');
+  });
+});
+
+/* Arranque */
+iniciarSharkTV();
+</script>
+
+</body>
+</html>
