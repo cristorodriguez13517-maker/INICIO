@@ -634,9 +634,58 @@ async function iniciarSharkTV() {
 
   banners = eliminarDuplicados(banners);
 
-  /* Más recientes primero */
+  /*
+     ORDEN DEL CARRUSEL:
+     1. Las 10 novedades más recientes aparecen primero.
+     2. El resto se mezcla aleatoriamente dentro de cada categoría.
+     3. Se mantiene el orden de categorías: Kids, Series y Películas.
+     El orden aleatorio se genera de nuevo cada vez que se carga SHARKTV.
+  */
 
-  banners.sort((a, b) => b.fecha - a.fecha);
+  const CANTIDAD_NOVEDADES = 10;
+
+  // Copia ordenada por fecha para conservar las novedades al principio.
+  const porFecha = [...banners].sort((a, b) => b.fecha - a.fecha);
+  const novedades = porFecha.slice(0, CANTIDAD_NOVEDADES);
+  const resto = porFecha.slice(CANTIDAD_NOVEDADES);
+
+  // Barajar un grupo sin alterar el array original.
+  function mezclarAleatoriamente(lista) {
+    const resultado = [...lista];
+
+    for (let i = resultado.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [resultado[i], resultado[j]] = [resultado[j], resultado[i]];
+    }
+
+    return resultado;
+  }
+
+  const restoKids = mezclarAleatoriamente(
+    resto.filter(item => item.catalogo === "Kids")
+  );
+
+  const restoSeries = mezclarAleatoriamente(
+    resto.filter(item => item.catalogo === "Series")
+  );
+
+  const restoPeliculas = mezclarAleatoriamente(
+    resto.filter(item => item.catalogo === "Películas")
+  );
+
+  banners = [
+    ...novedades,
+    ...restoKids,
+    ...restoSeries,
+    ...restoPeliculas
+  ];
+
+  console.log(
+    "Novedades: " + novedades.length +
+    " | Kids: " + restoKids.length +
+    " | Series: " + restoSeries.length +
+    " | Películas: " + restoPeliculas.length
+  );
 
   console.log(
     "Total de banners encontrados: " + banners.length
