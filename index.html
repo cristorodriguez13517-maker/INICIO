@@ -667,7 +667,7 @@ function mezclarAleatoriamente(lista) {
 
 
 /* =========================================
-   INICIAR CARRUSEL
+   INICIAR CARRUSEL - CATÁLOGO ALEATORIO
 ========================================= */
 
 async function iniciarSharkTV() {
@@ -678,81 +678,35 @@ async function iniciarSharkTV() {
     catalogos.map(cargarCatalogo)
   );
 
+  // Unir todos los contenidos de Películas, Series y Kids.
   banners = resultados.flat();
+
+  // Eliminar contenidos duplicados.
   banners = eliminarDuplicados(banners);
 
-  /*
-     ORDEN DEL CARRUSEL:
-     1. Las 10 novedades más recientes se muestran primero,
-        en orden aleatorio.
-     2. Después aparece el resto de Kids, aleatoriamente.
-     3. Después Series, aleatoriamente.
-     4. Después Películas, aleatoriamente.
-     El orden se genera de nuevo cada vez que se carga la página.
-  */
-
-  const CANTIDAD_NOVEDADES = 10;
-
-  const porFecha = [...banners].sort(
-    (a, b) => b.fecha - a.fecha
-  );
-
-  const novedadesOrdenadas =
-    porFecha.slice(0, CANTIDAD_NOVEDADES);
-
-  const resto =
-    porFecha.slice(CANTIDAD_NOVEDADES);
-
-  // Aleatorizar las novedades desde el primer banner.
-  const novedades =
-    mezclarAleatoriamente(novedadesOrdenadas);
-
-  // Resto del catálogo por categorías.
-  const restoKids = mezclarAleatoriamente(
-    resto.filter(item => item.catalogo === "Kids")
-  );
-
-  const restoSeries = mezclarAleatoriamente(
-    resto.filter(item => item.catalogo === "Series")
-  );
-
-  const restoPeliculas = mezclarAleatoriamente(
-    resto.filter(item => item.catalogo === "Películas")
-  );
-
-  banners = [
-    ...novedades,
-    ...restoKids,
-    ...restoSeries,
-    ...restoPeliculas
-  ];
+  // Mezclar todo el catálogo sin priorizar novedades
+  // ni separar por categorías.
+  banners = mezclarAleatoriamente(banners);
 
   console.log(
-    "Novedades: " + novedades.length +
-    " | Kids: " + restoKids.length +
-    " | Series: " + restoSeries.length +
-    " | Películas: " + restoPeliculas.length
-  );
-
-  console.log(
-    "Total de banners encontrados: " + banners.length
+    "Total de banners aleatorios: " + banners.length
   );
 
   if (!banners.length) {
-
     console.error(
       "No se encontraron contenidos con banner y logo."
     );
-
     return;
   }
 
-  currentIndex = -1;
+  // Elegir una posición inicial aleatoria.
+  currentIndex = Math.floor(Math.random() * banners.length);
 
+  // Mostrar el primer banner.
   cambiarSlide();
 
+  // Cambiar de banner cada 5 segundos.
   setInterval(cambiarSlide, 5000);
-
 }
 
 
