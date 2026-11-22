@@ -992,14 +992,9 @@ document.addEventListener("keydown", function(e) {
 
       mostrarMenu();
 
-      if (tecla === "ArrowDown") {
-        selectedIndex = 0;
-      }
-
-      if (tecla === "ArrowUp") {
-        selectedIndex = menuItems.length - 1;
-      }
-
+      // En TV, abrir el menú no selecciona ninguna categoría.
+      // La opción se marca solo al pulsar arriba o abajo de nuevo.
+      selectedIndex = -1;
       actualizarSeleccion();
 
       return;
