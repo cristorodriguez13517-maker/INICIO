@@ -150,9 +150,7 @@ a, button {
   appearance: none;
 }
 
-.menu-item.active,
-.menu-item:focus,
-.menu-item:focus-visible {
+.menu-item.active {
   color: #ff3038;
   transform: scale(1.08);
   transform-origin: left center;
@@ -447,7 +445,7 @@ menuToggle.addEventListener("click", () => {
 });
 
 let menuVisible = false;
-let selectedIndex = 0;
+let selectedIndex = -1;
 let hideTimer = null;
 
 const HIDE_DELAY = 5000;
@@ -836,8 +834,6 @@ function mostrarMenu() {
     header.classList.add("menu-visible");
     menuToggle.setAttribute("aria-expanded", "true");
 
-    actualizarSeleccion();
-
   }
 
   reiniciarTemporizador();
@@ -885,19 +881,21 @@ function actualizarSeleccion() {
 
     item.classList.toggle(
       "active",
-      index === selectedIndex
+      selectedIndex >= 0 && index === selectedIndex
     );
 
   });
 
-  // Mantener la opción seleccionada dentro de las tres visibles.
-  const primeraVisible = Math.max(
-    0,
-    Math.min(selectedIndex - 2, menuItems.length - 3)
-  );
+  // Desplazar la lista solo cuando el usuario selecciona una opción.
+  if (selectedIndex >= 0) {
+    const primeraVisible = Math.max(
+      0,
+      Math.min(selectedIndex - 2, menuItems.length - 3)
+    );
 
-  menu.style.transform =
-    `translateY(-${primeraVisible * 50}px)`;
+    menu.style.transform =
+      `translateY(-${primeraVisible * 50}px)`;
+  }
 }
 
 
@@ -929,14 +927,18 @@ function moverSeleccion(direccion) {
 
   mostrarMenu();
 
-  selectedIndex += direccion;
-
   if (selectedIndex < 0) {
-    selectedIndex = menuItems.length - 1;
-  }
+    selectedIndex = direccion > 0 ? 0 : menuItems.length - 1;
+  } else {
+    selectedIndex += direccion;
 
-  if (selectedIndex >= menuItems.length) {
-    selectedIndex = 0;
+    if (selectedIndex < 0) {
+      selectedIndex = menuItems.length - 1;
+    }
+
+    if (selectedIndex >= menuItems.length) {
+      selectedIndex = 0;
+    }
   }
 
   actualizarSeleccion();
