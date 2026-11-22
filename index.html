@@ -250,12 +250,27 @@ a, button {
   .touch-zone { display: none !important; }
 
   .header-logo {
-    bottom: 45px;
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0;
   }
 
   .header-logo img {
-    max-width: 240px;
-    max-height: 140px;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: calc(100vw - 40px);
+    max-height: 110px;
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto;
   }
 }
 
