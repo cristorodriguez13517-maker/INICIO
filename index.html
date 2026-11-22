@@ -261,6 +261,14 @@ a, button {
 }
 
 
+/* Mostrar el banner vertical completo para no cortar el título integrado en el póster */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .header {
+    background-size: 100% 100% !important;
+    background-position: center center !important;
+  }
+}
+
 /* Logo centrado y situado en la parte baja visible en móvil vertical */
 @media screen and (max-width: 600px) and (orientation: portrait) {
   .header .header-logo {
