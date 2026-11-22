@@ -213,12 +213,26 @@ a, button {
   }
 
   .menu-viewport {
-    height: 122px;
-    overflow: hidden;
+    height: 60vh;
+    max-height: 460px;
+    min-height: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    scrollbar-width: none;
+  }
+
+  .menu-viewport::-webkit-scrollbar {
+    display: none;
   }
 
   .menu {
     gap: 28px;
+    transform: none !important;
+    transition: none;
+    padding: 8px 0;
   }
 
   .menu-item {
@@ -1120,70 +1134,17 @@ touchZone.addEventListener("touchend", (e) => {
 
 }, { passive: true });
 
-// Tocar el menú lo mantiene visible y permite deslizar para cambiar
-// la opción seleccionada sin entrar en la categoría.
-let menuTouchStartY = 0;
-let menuSwipeHandled = false;
-
-menuContainer.addEventListener("touchstart", (e) => {
-
-  if (!e.changedTouches.length) return;
-
-  menuTouchStartY = e.changedTouches[0].clientY;
-  menuSwipeHandled = false;
+// Tocar el menú lo mantiene visible. El desplazamiento vertical
+// lo gestiona el navegador de forma nativa, como en una página web.
+menuContainer.addEventListener("touchstart", () => {
 
   mostrarMenu();
   reiniciarTemporizador();
 
 }, { passive: true });
 
-// Se usa captura para detectar el deslizamiento antes del touchend
-// de cada enlace y evitar que un gesto abra una categoría.
-menuContainer.addEventListener("touchend", (e) => {
-
-  if (!e.changedTouches.length) return;
-
-  const deltaY = e.changedTouches[0].clientY - menuTouchStartY;
-
-  if (Math.abs(deltaY) > 18) {
-
-    menuSwipeHandled = true;
-    e.preventDefault();
-
-    moverSeleccion(deltaY < 0 ? 1 : -1);
-    reiniciarTemporizador();
-  }
-
-}, { capture: true, passive: false });
-
-// Un toque corto y deliberado sí entra en la categoría.
-menuItems.forEach((item, index) => {
-
-  item.addEventListener("touchend", (e) => {
-
-    e.preventDefault();
-
-    if (menuSwipeHandled) {
-      menuSwipeHandled = false;
-      return;
-    }
-
-    selectedIndex = index;
-    actualizarSeleccion();
-
-    if (item.dataset.comingSoon === "true") {
-
-      mostrarAviso();
-      reiniciarTemporizador();
-
-    } else {
-
-      window.location.href = item.href;
-    }
-
-  }, { passive: false });
-
-});
+// Al tocar una categoría se conserva el comportamiento normal del enlace.
+// No interceptamos touchend: así deslizar no activa accidentalmente enlaces.
 
 // Tocar fuera del menú lo oculta.
 document.addEventListener("touchstart", (e) => {
