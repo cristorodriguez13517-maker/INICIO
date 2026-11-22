@@ -261,6 +261,33 @@ a, button {
 }
 
 
+/* Centrar el logo en móviles verticales sin alterar su carga original */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .header-logo {
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0;
+  }
+
+  .header-logo img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: calc(100vw - 40px);
+    max-height: 18svh;
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto;
+  }
+}
+
 /* Botón hamburguesa: solo aparece en móviles */
 .menu-toggle {
   display: none;
