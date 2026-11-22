@@ -295,6 +295,21 @@ a, button {
 }
 .header.menu-visible .menu-toggle { border-color: #e50914; }
 
+/* Forzar visibilidad del botón en pantallas móviles.
+   Esta regla va después de la regla base display:none. */
+@media screen and (max-width: 600px) {
+  .menu-toggle {
+    display: flex !important;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 9999;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
 /* =================================
    ZONA TÁCTIL IZQUIERDA
 ================================= */
