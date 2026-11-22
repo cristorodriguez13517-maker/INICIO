@@ -192,70 +192,50 @@ a, button {
 ================================= */
 
 @media (max-width: 600px) {
-
-  /* Menú táctil: panel claro y opciones grandes */
-  .menu-toggle { display: flex; }
-
+  /* Conservar el diseño original del menú lateral */
   .header-top {
-    position: fixed;
-    top: 68px;
-    left: 12px;
-    width: calc(100% - 24px);
-    max-width: 360px;
-    max-height: calc(100vh - 90px);
-    padding: 14px;
-    border: 1px solid rgba(255,255,255,.16);
-    border-radius: 14px;
-    background: rgba(12,12,12,.97);
-    box-shadow: 0 12px 36px rgba(0,0,0,.65);
-    transform: translateX(-120%);
-    overflow-y: auto;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 230px;
+    max-height: none;
+    padding: 0 0 0 25px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: translate(-110%, -50%);
+    overflow: visible;
   }
 
-  .header.menu-visible .header-top { transform: translateX(0); }
-  .menu-viewport { height: auto; overflow: visible; }
-  .menu { gap: 6px; transform: none !important; }
-
-  .menu-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    min-height: 50px;
-    height: auto;
-    padding: 12px 14px;
-    border-radius: 9px;
-    font-size: 18px;
-    line-height: 1.25;
-  }
-
-  .menu-item.active,
-  .menu-item:focus,
-  .menu-item:focus-visible {
-    color: #fff;
-    background: rgba(229,9,20,.22) !important;
-    transform: none;
-    box-shadow: inset 3px 0 #e50914 !important;
-    text-shadow: none;
-  }
-
-  .touch-zone { display: none !important; }
-
-  .header::before {
-    width: 300px;
-  }
-
-  .header-top {
-    padding-left: 20px;
-    width: 190px;
-  }
-
-  .menu-item {
-    font-size: 18px;
+  .header.menu-visible .header-top {
+    transform: translate(0, -50%);
   }
 
   .menu-viewport {
     height: 122px;
+    overflow: hidden;
   }
+
+  .menu {
+    gap: 28px;
+  }
+
+  .menu-item {
+    display: block;
+    width: fit-content;
+    min-height: 0;
+    height: 22px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 20px;
+    line-height: 22px;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* En móvil se abre con el botón; no con gestos en el borde */
+  .touch-zone { display: none !important; }
 
   .header-logo {
     bottom: 45px;
