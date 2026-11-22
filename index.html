@@ -193,6 +193,53 @@ a, button {
 
 @media (max-width: 600px) {
 
+  /* Menú táctil: panel claro y opciones grandes */
+  .menu-toggle { display: flex; }
+
+  .header-top {
+    position: fixed;
+    top: 68px;
+    left: 12px;
+    width: calc(100% - 24px);
+    max-width: 360px;
+    max-height: calc(100vh - 90px);
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 14px;
+    background: rgba(12,12,12,.97);
+    box-shadow: 0 12px 36px rgba(0,0,0,.65);
+    transform: translateX(-120%);
+    overflow-y: auto;
+  }
+
+  .header.menu-visible .header-top { transform: translateX(0); }
+  .menu-viewport { height: auto; overflow: visible; }
+  .menu { gap: 6px; transform: none !important; }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 50px;
+    height: auto;
+    padding: 12px 14px;
+    border-radius: 9px;
+    font-size: 18px;
+    line-height: 1.25;
+  }
+
+  .menu-item.active,
+  .menu-item:focus,
+  .menu-item:focus-visible {
+    color: #fff;
+    background: rgba(229,9,20,.22) !important;
+    transform: none;
+    box-shadow: inset 3px 0 #e50914 !important;
+    text-shadow: none;
+  }
+
+  .touch-zone { display: none !important; }
+
   .header::before {
     width: 300px;
   }
@@ -219,6 +266,34 @@ a, button {
     max-height: 140px;
   }
 }
+
+/* Botón hamburguesa: solo aparece en móviles */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 40;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 12px;
+  background: rgba(12,12,12,.88);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: #fff;
+}
+.header.menu-visible .menu-toggle { border-color: #e50914; }
 
 /* =================================
    ZONA TÁCTIL IZQUIERDA
@@ -257,6 +332,12 @@ a, button {
 <body>
 
 <div class="header" id="header">
+
+  <!-- BOTÓN DE MENÚ PARA MÓVIL -->
+  <button class="menu-toggle" id="menu-toggle" type="button"
+          aria-label="Abrir menú" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 
   <!-- MENÚ -->
 
@@ -349,6 +430,12 @@ let avisoTimer = null;
 
 const touchZone = document.getElementById("touch-zone");
 const menuContainer = document.getElementById("menu-container");
+const menuToggle = document.getElementById("menu-toggle");
+
+menuToggle.addEventListener("click", () => {
+  if (menuVisible) ocultarMenu();
+  else mostrarMenu();
+});
 
 let menuVisible = false;
 let selectedIndex = 0;
@@ -738,6 +825,7 @@ function mostrarMenu() {
     menuVisible = true;
 
     header.classList.add("menu-visible");
+    menuToggle.setAttribute("aria-expanded", "true");
 
     actualizarSeleccion();
 
@@ -756,6 +844,7 @@ function ocultarMenu() {
   menuVisible = false;
 
   header.classList.remove("menu-visible");
+  menuToggle.setAttribute("aria-expanded", "false");
 
   clearTimeout(hideTimer);
 }
