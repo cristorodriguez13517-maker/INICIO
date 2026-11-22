@@ -338,6 +338,10 @@ a, button {
 @media screen and (max-width: 600px) {
   .menu-toggle {
     display: flex !important;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
     position: fixed;
     top: 16px;
     left: 16px;
@@ -354,6 +358,18 @@ a, button {
     width: 20px;
     height: 2px;
     border-radius: 2px;
+  }
+
+  .header.screen-touched:not(.menu-visible) .menu-toggle {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .header.menu-visible .menu-toggle {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 }
 
@@ -1210,6 +1226,13 @@ menuContainer.addEventListener("touchstart", () => {
 // No interceptamos touchend: así deslizar no activa accidentalmente enlaces.
 
 // Tocar fuera del menú lo oculta.
+// Mostrar el botón hamburguesa tras el primer toque en la pantalla.
+document.addEventListener("touchstart", () => {
+  if (window.matchMedia("(max-width: 600px)").matches && !menuVisible) {
+    header.classList.add("screen-touched");
+  }
+}, { passive: true });
+
 document.addEventListener("touchstart", (e) => {
 
   if (!menuVisible) return;
