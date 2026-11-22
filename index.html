@@ -175,6 +175,10 @@ a, button {
 }
 
 .header-logo img {
+  background: transparent !important;
+  border: 0 !important;
+  outline: 0 !important;
+  visibility: hidden;
   max-width: 300px;
   max-height: 180px;
   width: 100%;
@@ -438,7 +442,7 @@ a, button {
   <!-- LOGO -->
 
   <div class="header-logo">
-    <img id="header-logo-img" src="" alt="">
+    <img id="header-logo-img" alt="">
   </div>
 
 </div>
@@ -796,16 +800,20 @@ async function cambiarSlide() {
 
     // Evitar el cuadro blanco: mostrar el logo solo cuando la imagen esté cargada.
     logoImg.style.opacity = 0;
+    logoImg.style.visibility = "hidden";
     logoImg.onload = () => {
+      logoImg.style.visibility = "visible";
       logoImg.style.opacity = 1;
     };
     logoImg.onerror = () => {
+      logoImg.style.visibility = "hidden";
       logoImg.style.opacity = 0;
     };
     logoImg.src = elemento.logo;
 
     // Si ya estaba en caché, mostrarla sin esperar otro evento.
     if (logoImg.complete && logoImg.naturalWidth > 0) {
+      logoImg.style.visibility = "visible";
       logoImg.style.opacity = 1;
     }
 
