@@ -1164,7 +1164,8 @@ document.addEventListener("touchstart", (e) => {
 
   if (
     !menuContainer.contains(e.target) &&
-    !touchZone.contains(e.target)
+    !touchZone.contains(e.target) &&
+    !menuToggle.contains(e.target)
   ) {
 
     ocultarMenu();
