@@ -249,34 +249,41 @@ a, button {
   /* En móvil se abre con el botón; no con gestos en el borde */
   .touch-zone { display: none !important; }
 
-  /* El ajuste del logo se aplica solo al móvil en vertical */
-  @media (orientation: portrait) {
-    .header-logo {
-      left: 50%;
-      bottom: max(24px, env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      width: calc(100% - 32px);
-      max-width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-sizing: border-box;
-      padding: 0;
-    }
 
-    .header-logo img {
-      display: block;
-      width: auto;
-      height: auto;
-      max-width: calc(100vw - 40px);
-      max-height: 18svh;
-      object-fit: contain;
-      object-position: center;
-      margin: 0 auto;
-    }
-  }
 }
 
+
+/* Logos completos en móviles táctiles usados en vertical */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .header-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: 100%;
+    height: 24svh;
+    max-width: none;
+    padding: 0 5vw;
+    margin: 0;
+    transform: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .header-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto;
+    flex: 0 1 auto;
+  }
+}
 /* Botón hamburguesa: solo aparece en móviles */
 .menu-toggle {
   display: none;
