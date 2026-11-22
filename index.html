@@ -249,28 +249,31 @@ a, button {
   /* En móvil se abre con el botón; no con gestos en el borde */
   .touch-zone { display: none !important; }
 
-  .header-logo {
-    left: 50%;
-    bottom: max(24px, env(safe-area-inset-bottom));
-    transform: translateX(-50%);
-    width: calc(100% - 32px);
-    max-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 0;
-  }
+  /* El ajuste del logo se aplica solo al móvil en vertical */
+  @media (orientation: portrait) {
+    .header-logo {
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 0;
+    }
 
-  .header-logo img {
-    display: block;
-    width: auto;
-    height: auto;
-    max-width: calc(100vw - 40px);
-    max-height: 110px;
-    object-fit: contain;
-    object-position: center;
-    margin: 0 auto;
+    .header-logo img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: calc(100vw - 40px);
+      max-height: 18svh;
+      object-fit: contain;
+      object-position: center;
+      margin: 0 auto;
+    }
   }
 }
 
@@ -349,39 +352,6 @@ a, button {
 }
 
 
-/* Ajuste de logos para móviles táctiles en vertical y horizontal */
-@media (hover: none) and (pointer: coarse) and (max-width: 900px) {
-  .header {
-    height: 100svh;
-    min-height: 100svh;
-  }
-
-  .header-logo {
-    left: 50%;
-    right: auto;
-    bottom: max(16px, env(safe-area-inset-bottom));
-    width: 100%;
-    max-width: 100%;
-    padding-left: 16px;
-    padding-right: 16px;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .header-logo img {
-    display: block;
-    width: min(82vw, 300px);
-    height: min(18svh, 110px);
-    max-width: 100%;
-    max-height: 18svh;
-    object-fit: contain;
-    object-position: center center;
-    margin: 0 auto;
-    flex: 0 1 auto;
-  }
-}
 </style>
 </head>
 
