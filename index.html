@@ -179,6 +179,8 @@ a, button {
   max-height: 180px;
   width: 100%;
   object-fit: contain;
+  visibility: hidden;
+  opacity: 0;
 
   filter: drop-shadow(0 0 15px rgba(0,0,0,0.9));
 
@@ -779,14 +781,18 @@ async function cambiarSlide() {
     header.style.backgroundImage =
       `url("${elemento.backdrop}")`;
 
+    // Mantener oculto el logo hasta que el navegador confirme que cargó.
     logoImg.style.opacity = 0;
-
-    setTimeout(() => {
-
-      logoImg.src = elemento.logo;
+    logoImg.style.visibility = "hidden";
+    logoImg.onload = () => {
+      logoImg.style.visibility = "visible";
       logoImg.style.opacity = 1;
-
-    }, 300);
+    };
+    logoImg.onerror = () => {
+      logoImg.style.visibility = "hidden";
+      logoImg.style.opacity = 0;
+    };
+    logoImg.src = elemento.logo;
 
   }
 
