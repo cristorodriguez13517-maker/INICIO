@@ -337,7 +337,7 @@ a, button {
    Esta regla va después de la regla base display:none. */
 @media screen and (max-width: 600px) {
   .menu-toggle {
-    display: flex !important;
+    display: none !important;
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
@@ -360,17 +360,6 @@ a, button {
     border-radius: 2px;
   }
 
-  .header.screen-touched:not(.menu-visible) .menu-toggle {
-    visibility: visible;
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .header.menu-visible .menu-toggle {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
 }
 
 /* =================================
@@ -1225,24 +1214,21 @@ menuContainer.addEventListener("touchstart", () => {
 // Al tocar una categoría se conserva el comportamiento normal del enlace.
 // No interceptamos touchend: así deslizar no activa accidentalmente enlaces.
 
-// Tocar fuera del menú lo oculta.
-// Mostrar el botón hamburguesa tras el primer toque en la pantalla.
-document.addEventListener("touchstart", () => {
-  if (window.matchMedia("(max-width: 600px)").matches && !menuVisible) {
-    header.classList.add("screen-touched");
-  }
-}, { passive: true });
-
+// En móvil, tocar cualquier parte de la pantalla abre el menú.
+// Si ya está abierto, tocar fuera de él lo cierra.
 document.addEventListener("touchstart", (e) => {
+
+  if (window.matchMedia("(max-width: 600px)").matches && !menuVisible) {
+    mostrarMenu();
+    return;
+  }
 
   if (!menuVisible) return;
 
   if (
     !menuContainer.contains(e.target) &&
-    !touchZone.contains(e.target) &&
-    !menuToggle.contains(e.target)
+    !touchZone.contains(e.target)
   ) {
-
     ocultarMenu();
   }
 
