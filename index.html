@@ -285,6 +285,16 @@ a, button {
     flex: 0 1 auto;
   }
 }
+
+/* Adaptar también los fondos/banner al móvil en vertical sin recortarlos */
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  .header {
+    background-size: contain !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-color: #000;
+  }
+}
 /* Botón hamburguesa: solo aparece en móviles */
 .menu-toggle {
   display: none;
