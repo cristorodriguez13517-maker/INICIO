@@ -1120,20 +1120,53 @@ touchZone.addEventListener("touchend", (e) => {
 
 }, { passive: true });
 
-// Tocar directamente el menú lo mantiene visible.
-menuContainer.addEventListener("touchstart", () => {
+// Tocar el menú lo mantiene visible y permite deslizar para cambiar
+// la opción seleccionada sin entrar en la categoría.
+let menuTouchStartY = 0;
+let menuSwipeHandled = false;
+
+menuContainer.addEventListener("touchstart", (e) => {
+
+  if (!e.changedTouches.length) return;
+
+  menuTouchStartY = e.changedTouches[0].clientY;
+  menuSwipeHandled = false;
 
   mostrarMenu();
   reiniciarTemporizador();
 
 }, { passive: true });
 
-// Tocar una opción del menú permite entrar en ella.
+// Se usa captura para detectar el deslizamiento antes del touchend
+// de cada enlace y evitar que un gesto abra una categoría.
+menuContainer.addEventListener("touchend", (e) => {
+
+  if (!e.changedTouches.length) return;
+
+  const deltaY = e.changedTouches[0].clientY - menuTouchStartY;
+
+  if (Math.abs(deltaY) > 18) {
+
+    menuSwipeHandled = true;
+    e.preventDefault();
+
+    moverSeleccion(deltaY < 0 ? 1 : -1);
+    reiniciarTemporizador();
+  }
+
+}, { capture: true, passive: false });
+
+// Un toque corto y deliberado sí entra en la categoría.
 menuItems.forEach((item, index) => {
 
   item.addEventListener("touchend", (e) => {
 
     e.preventDefault();
+
+    if (menuSwipeHandled) {
+      menuSwipeHandled = false;
+      return;
+    }
 
     selectedIndex = index;
     actualizarSeleccion();
