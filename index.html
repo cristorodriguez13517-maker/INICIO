@@ -265,11 +265,15 @@ a, button {
 }
 
 
-/* Mostrar el banner vertical completo para no cortar el título integrado en el póster */
+/* En móvil vertical, centrar la imagen y cubrir toda la pantalla sin deformarla */
 @media screen and (max-width: 600px) and (orientation: portrait) {
   .header {
-    background-size: 100% 100% !important;
+    width: 100vw !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    background-size: cover !important;
     background-position: center center !important;
+    background-repeat: no-repeat !important;
   }
 }
 
