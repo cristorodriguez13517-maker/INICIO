@@ -64,7 +64,20 @@ function render(){
   const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Progreso no disponible')+(item.repo?' · '+item.repo:'');
   const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
   const actions=document.createElement('div');actions.className='actions';
-  const link=document.createElement('a');link.className='resume';link.href=item.url||'#';link.target='_blank';link.rel='noopener';link.textContent='Continuar';
+  const link=document.createElement('a');link.className='resume';link.href=item.url||item.fallbackUrl||'#';link.target='_blank';link.rel='noopener';link.textContent='Continuar';
+  if(item.player==='VLC'){
+   link.addEventListener('click',function(e){
+    const raw=item.url||'';
+    try{
+     const media=new URL(raw);
+     if(media.protocol==='https:'||media.protocol==='http:'){
+      e.preventDefault();
+      const intent='intent://'+media.host+media.pathname+media.search+'#Intent;scheme='+media.protocol.replace(':','')+';package=org.videolan.vlc;type=video/*;end';
+      window.location.href=intent;
+     }
+    }catch(err){}
+   });
+  }
   const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
   actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
  });
