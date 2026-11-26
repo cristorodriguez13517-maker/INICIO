@@ -17,7 +17,7 @@ h1{font-size:clamp(26px,4vw,38px);margin:0 0 8px}.sub{color:#aeb3c0;margin:0 0 2
 .poster .placeholder{font-size:42px;opacity:.55}.player{position:absolute;left:10px;top:10px;padding:6px 9px;border-radius:5px;font-size:11px;font-weight:bold;background:#a20d19}
 .player.smarttube{background:#b51226}.player.vlc{background:#b66a16}
 .info{padding:14px}.title{font-weight:bold;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{font-size:12px;color:#aeb3c0;margin-top:6px}
-.progress{height:5px;border-radius:10px;background:#373c48;margin:13px 0 7px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
+.progress{height:5px;border-radius:10px;background:#373c48;margin:13px 0 7px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}\n.progress-editor{margin-top:12px}.progress-editor label{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#c5cad4;margin-bottom:5px}.progress-editor input{width:100%;padding:0;accent-color:#e50914;cursor:pointer}
 .actions{display:flex;gap:8px;margin-top:12px}.actions a,.actions button{border:0;border-radius:6px;padding:9px 11px;font-weight:bold;font-size:12px;cursor:pointer}.resume{background:#e50914;color:#fff;flex:1;text-align:center}.remove{background:#303541;color:#ddd}
 .empty{border:1px dashed #414755;border-radius:12px;padding:35px 22px;text-align:center;color:#b8bdc8;grid-column:1/-1}.empty strong{display:block;color:#fff;font-size:19px;margin-bottom:9px}
 details{margin-top:34px;background:#11141b;border:1px solid #292e3a;border-radius:10px;padding:16px}summary{cursor:pointer;font-weight:bold}
@@ -44,7 +44,7 @@ form button{border:0;border-radius:7px;background:#e50914;color:#fff;font-weight
 <input id="percent" type="number" min="0" max="99" value="0" placeholder="Progreso (%)">
 <button type="submit">Guardar en Seguir viendo</button>
 </form>
-<p class="note">La lista se guarda en este dispositivo y navegador. El avance automático desde SmartTube o VLC todavía requiere conectar los repositorios reproductores; estos reproductores externos no siempre comunican el minuto de reproducción a SHARKTV.</p>
+<p class="note">La lista se guarda en este dispositivo y navegador. Por ahora puedes ajustar la barra de cada título al porcentaje donde te quedaste. El avance automático desde SmartTube o VLC aún no es posible porque esos reproductores externos no envían el minuto de reproducción a SHARKTV.</p>
 </details>
 </main>
 <script>
@@ -62,12 +62,12 @@ function render(){
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player||'SmartTube';poster.append(badge);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Añadido · progreso no disponible')+(item.repo?' · '+item.repo:'');
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'+(item.progressSource==='manual'?' · ajustado por ti':'')):'Añadido · indica dónde te quedaste')+(item.repo?' · '+item.repo:'');
   const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
-  const actions=document.createElement('div');actions.className='actions';
+  const editor=document.createElement('div');editor.className='progress-editor';const editorLabel=document.createElement('label');const editorCaption=document.createElement('span');editorCaption.textContent='¿Por dónde te quedaste?';const editorValue=document.createElement('strong');editorValue.textContent=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';editorLabel.append(editorCaption,editorValue);const slider=document.createElement('input');slider.type='range';slider.min='0';slider.max='99';slider.step='1';slider.value=String(Math.max(0,Math.min(99,Number(item.percent)||0)));slider.setAttribute('aria-label','Progreso visto de '+(item.title||'contenido'));slider.addEventListener('input',()=>{editorValue.textContent=slider.value+'%'});slider.addEventListener('change',()=>{const next=read();const current=next[index];if(!current)return;current.percent=Number(slider.value);current.progressSource='manual';current.updatedAt=Date.now();save(next);render()});editor.append(editorLabel,slider);\n  const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Continuar';
   const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
-  actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
+  actions.append(link,del);info.append(title,meta,bar,editor,actions);card.append(poster,info);root.append(card);
  });
 }
 document.getElementById('add-form').addEventListener('submit',e=>{
