@@ -59,11 +59,6 @@ function render(){
   actions.append(link,del);info.append(title,meta,bar,editor,actions);card.append(poster,info);root.append(card);
  });
 }
-document.getElementById('add-form').addEventListener('submit',e=>{
- e.preventDefault();
- const item={id:Date.now(),title:document.getElementById('title').value.trim(),poster:document.getElementById('poster').value.trim(),url:document.getElementById('play').value.trim(),player:document.getElementById('player').value,percent:Math.max(0,Math.min(99,Number(document.getElementById('percent').value)||0))};
- const items=read();items.unshift(item);save(items);e.target.reset();document.getElementById('percent').value=0;render();
-});
 window.addEventListener('storage',render);render();
 </script>
 </body>
