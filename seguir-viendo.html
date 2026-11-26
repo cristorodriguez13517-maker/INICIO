@@ -66,7 +66,7 @@ function render(){
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
   let continueUrl=item.url||item.fallbackUrl||'#';
-  if(item.player==='VLC'&&item.magnetId&&item.filePath&&item.repo){
+  if(item.player==='VLC'&&item.repo){
    const isEpisode=item.kind==='episode';
    const base='/'+item.repo+'/';
    const target=base+'reanudar.html';
