@@ -94,15 +94,14 @@ async function playAllDebridDirectly(item){
    const fail=msg=>{if(!settled){settled=true;reject(new Error(msg));}};
    const timer=setTimeout(()=>fail('La verificación de seguridad tardó demasiado.'),30000);
    try{
-    window.turnstile.render(host,{
+    const widgetId=window.turnstile.render(host,{
      sitekey:'0x4AAAAAAGK-CFVW1ivlcFRe',action:'reproducir',execution:'execute',size:'invisible',appearance:'interaction-only',
      callback:t=>{if(!settled){settled=true;clearTimeout(timer);resolve(t);}},
      'error-callback':()=>fail('Falló la verificación de seguridad.'),
      'unsupported-callback':()=>fail('Este navegador no admite la verificación de seguridad.'),
      'timeout-callback':()=>fail('La verificación de seguridad agotó el tiempo.')
     });
-    const widget=host.firstElementChild;
-    setTimeout(()=>{try{window.turnstile.execute(host.firstElementChild?host.firstElementChild.parentElement:host)}catch(e){}},0);
+    window.turnstile.execute(widgetId);
    }catch(e){clearTimeout(timer);reject(e);}
   });
   const response=await fetch('https://alldebrid-vlc.cristorodriguez13517.workers.dev/',{
