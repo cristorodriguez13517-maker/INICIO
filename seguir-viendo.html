@@ -58,27 +58,14 @@ function render(){
   const card=document.createElement('article');card.className='movie-card';
   const poster=document.createElement('div');poster.className='poster';
   if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';poster.append(img)}else{poster.textContent='▶'}
-  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · Interno':'YouTube · Interno';poster.append(badge);
+  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';poster.append(badge);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
   const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Progreso no disponible')+(Number(item.position)>0?' · '+Math.floor(Number(item.position)/60)+' min reproducidos':'')+(item.repo?' · '+item.repo:'');
   const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
-  let continueUrl=item.url||item.fallbackUrl||'#';
-  if(item.repo&&['PELICULAS','SERIES','KIDS','ALLDEBRID-PELICULAS','ALLDEBRID-SERIES','ALLDEBRID-KIDS'].includes(item.repo)){
-   const base='/'+item.repo+'/reproductor.html';
-   const params=new URLSearchParams({item:String(item.id||''),title:String(item.title||'SHARKTV')});
-   if(item.player==='VLC'){
-    params.set('magnet',String(item.magnetId||''));
-    params.set('path',String(item.filePath||''));
-    params.set('kind',item.kind==='episode'?'episode':'movie');
-   }else{
-    const source=item.sourceUrl||item.url||item.fallbackUrl||'';
-    if(source)params.set('source',source);
-   }
-   continueUrl=base+'?'+params.toString();
-  }
+  const continueUrl=item.url||item.fallbackUrl||'#';
   link.href=continueUrl;
   link.target='_self';
   link.rel='noopener';
