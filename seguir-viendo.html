@@ -55,6 +55,22 @@ const KEY='sharktv_seguir_viendo_v1';
 const root=document.getElementById('items');
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
+function getExternalPlaybackUrl(item){
+ // AllDebrid debe volver a preparar el enlace con su API y lanzar VLC mediante Android Intent.
+ if(item.player==='VLC'&&item.magnetId&&item.filePath){
+  const repo=String(item.repo||'ALLDEBRID-PELICULAS').toUpperCase();
+  const bases={
+   'ALLDEBRID-PELICULAS':'https://cristorodriguez13517-maker.github.io/ALLDEBRID-PELICULAS/',
+   'ALLDEBRID-SERIES':'https://cristorodriguez13517-maker.github.io/ALLDEBRID-SERIES/',
+   'ALLDEBRID-KIDS':'https://cristorodriguez13517-maker.github.io/ALLDEBRID-KIDS/'
+  };
+  const base=bases[repo]||bases['ALLDEBRID-PELICULAS'];
+  const params=new URLSearchParams({shark_magnet:String(item.magnetId),shark_path:String(item.filePath),shark_kind:String(item.kind||'movie')});
+  return base+'?'+params.toString();
+ }
+ // Los enlaces de SmartTube/YouTube se entregan al sistema para abrir la app asociada.
+ return item.sourceUrl||item.url||item.fallbackUrl||'#';
+}
 function render(){
  const items=read();root.replaceChildren();
  const header=document.getElementById('header');
@@ -62,8 +78,8 @@ function render(){
  if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio desde SHARKTV, aparecerá aquí.';root.append(e);return}
  items.forEach((item,index)=>{
   const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
-  const continueUrl=item.url||item.fallbackUrl||'#';
-  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));
+  const continueUrl=getExternalPlaybackUrl(item);
+  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.target='_blank';poster.rel='noopener';poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
   if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';posterBox.append(img)}else{posterBox.textContent='▶'}
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';posterBox.append(badge);poster.append(posterBox);
@@ -74,7 +90,7 @@ function render(){
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
   link.href=continueUrl;
-  link.target='_self';
+  link.target='_blank';
   link.rel='noopener';
   const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
   actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
