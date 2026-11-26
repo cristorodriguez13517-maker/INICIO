@@ -34,18 +34,7 @@ form button{border:0;border-radius:7px;background:#e50914;color:#fff;font-weight
 <h1>▶ Seguir viendo</h1>
 <p class="sub">Tus películas y series pendientes, reunidas en un solo lugar.</p>
 <section class="grid" id="items" aria-live="polite"></section>
-<details>
-<summary>Añadir contenido manualmente</summary>
-<form id="add-form">
-<input id="title" placeholder="Título" required maxlength="120">
-<input id="poster" placeholder="URL de la carátula (opcional)" type="url">
-<input id="play" placeholder="Enlace para continuar" type="url" required>
-<select id="player"><option value="SmartTube">SmartTube · YouTube</option><option value="VLC">VLC · AllDebrid</option></select>
-<input id="percent" type="number" min="0" max="99" value="0" placeholder="Progreso (%)">
-<button type="submit">Guardar en Seguir viendo</button>
-</form>
-<p class="note">La lista se guarda en este dispositivo y navegador. Por ahora puedes ajustar la barra de cada título al porcentaje donde te quedaste. El avance automático desde SmartTube o VLC aún no es posible porque esos reproductores externos no envían el minuto de reproducción a SHARKTV.</p>
-</details>
+<p class="note">Los contenidos se añaden automáticamente al iniciar su reproducción desde SHARKTV. El porcentaje exacto requiere que SmartTube o VLC comuniquen el tiempo reproducido.</p>
 </main>
 <script>
 const KEY='sharktv_seguir_viendo_v1';
@@ -62,7 +51,7 @@ function render(){
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player||'SmartTube';poster.append(badge);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'+(item.progressSource==='manual'?' · ajustado por ti':'')):'Añadido · indica dónde te quedaste')+(item.repo?' · '+item.repo:'');
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Añadido · progreso no disponible')+(item.repo?' · '+item.repo:'');
   const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
   const editor=document.createElement('div');editor.className='progress-editor';const editorLabel=document.createElement('label');const editorCaption=document.createElement('span');editorCaption.textContent='¿Por dónde te quedaste?';const editorValue=document.createElement('strong');editorValue.textContent=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';editorLabel.append(editorCaption,editorValue);const slider=document.createElement('input');slider.type='range';slider.min='0';slider.max='99';slider.step='1';slider.value=String(Math.max(0,Math.min(99,Number(item.percent)||0)));slider.setAttribute('aria-label','Progreso visto de '+(item.title||'contenido'));slider.addEventListener('input',()=>{editorValue.textContent=slider.value+'%'});slider.addEventListener('change',()=>{const next=read();const current=next[index];if(!current)return;current.percent=Number(slider.value);current.progressSource='manual';current.updatedAt=Date.now();save(next);render()});editor.append(editorLabel,slider);\n  const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.href=item.url;link.target='_blank';link.rel='noopener';link.textContent='Continuar';
