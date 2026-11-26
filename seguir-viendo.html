@@ -58,7 +58,7 @@ function render(){
   const card=document.createElement('article');card.className='movie-card';
   const poster=document.createElement('div');poster.className='poster';
   if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';poster.append(img)}else{poster.textContent='▶'}
-  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player||'SmartTube';poster.append(badge);
+  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · Interno':'YouTube · Interno';poster.append(badge);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
   const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Progreso no disponible')+(Number(item.position)>0?' · '+Math.floor(Number(item.position)/60)+' min reproducidos':'')+(item.repo?' · '+item.repo:'');
