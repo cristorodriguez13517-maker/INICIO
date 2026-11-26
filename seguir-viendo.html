@@ -69,7 +69,7 @@ function render(){
   if(item.player==='VLC'&&item.magnetId&&item.filePath&&item.repo){
    const isEpisode=item.kind==='episode';
    const base='/'+item.repo+'/';
-   const target=isEpisode?base+'series.html?id='+encodeURIComponent(item.seriesId||''):base+'index.html';
+   const target=base+'reanudar.html';
    const params=new URLSearchParams({shark_magnet:String(item.magnetId),shark_path:String(item.filePath),shark_kind:isEpisode?'episode':'movie'});
    continueUrl=target+'?'+params.toString();
   }
