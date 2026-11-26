@@ -56,7 +56,8 @@ const root=document.getElementById('items');
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
 function getExternalPlaybackUrl(item){
- // AllDebrid debe volver a preparar el enlace con su API y lanzar VLC mediante Android Intent.
+ // Para AllDebrid se abre el catálogo correcto con los datos del archivo.
+ // El propio catálogo ejecuta su flujo seguro de Turnstile y Worker y lanza VLC.
  if(item.player==='VLC'&&item.magnetId&&item.filePath){
   const repo=String(item.repo||'ALLDEBRID-PELICULAS').toUpperCase();
   const bases={
@@ -66,64 +67,16 @@ function getExternalPlaybackUrl(item){
   };
   const base=bases[repo]||bases['ALLDEBRID-PELICULAS'];
   const params=new URLSearchParams({shark_magnet:String(item.magnetId),shark_path:String(item.filePath),shark_kind:String(item.kind||'movie')});
+  if(repo==='ALLDEBRID-SERIES'&&item.seriesId){
+   return base+'series.html?id='+encodeURIComponent(item.seriesId)+'&'+params.toString();
+  }
   return base+'?'+params.toString();
  }
  // Los enlaces de SmartTube/YouTube se entregan al sistema para abrir la app asociada.
  return item.sourceUrl||item.url||item.fallbackUrl||'#';
 }
-async function playAllDebridDirectly(item){
- const popup=window.open('about:blank','_blank');
- if(!popup){alert('Permite las ventanas emergentes para abrir VLC.');return;}
- try{
-  popup.document.title='Preparando reproducción';
-  popup.document.body.style.cssText='margin:0;background:#080b12;color:white;font:600 18px system-ui;display:grid;place-items:center;height:100vh';
-  popup.document.body.textContent='Preparando reproducción…';
-  const magnetId=String(item.magnetId||'');
-  const filePath=String(item.filePath||'');
-  if(!/^\\d+$/.test(magnetId)||!filePath)throw new Error('Faltan los datos de AllDebrid para reanudar este archivo.');
-  if(!window.turnstile){
-   await new Promise((resolve,reject)=>{
-    const s=document.createElement('script');s.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';s.onload=resolve;s.onerror=()=>reject(new Error('No se pudo cargar la verificación de seguridad.'));document.head.appendChild(s);
-   });
-  }
-  const host=document.createElement('div');
-  host.style.cssText='position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;overflow:hidden';
-  document.body.appendChild(host);
-  const token=await new Promise((resolve,reject)=>{
-   let settled=false;
-   const fail=msg=>{if(!settled){settled=true;reject(new Error(msg));}};
-   const timer=setTimeout(()=>fail('La verificación de seguridad tardó demasiado.'),30000);
-   try{
-    const widgetId=window.turnstile.render(host,{
-     sitekey:'0x4AAAAAAGK-CFVW1ivlcFRe',action:'reproducir',execution:'execute',size:'invisible',appearance:'interaction-only',
-     callback:t=>{if(!settled){settled=true;clearTimeout(timer);resolve(t);}},
-     'error-callback':()=>fail('Falló la verificación de seguridad.'),
-     'unsupported-callback':()=>fail('Este navegador no admite la verificación de seguridad.'),
-     'timeout-callback':()=>fail('La verificación de seguridad agotó el tiempo.')
-    });
-    window.turnstile.execute(widgetId);
-   }catch(e){clearTimeout(timer);reject(e);}
-  });
-  const response=await fetch('https://alldebrid-vlc.cristorodriguez13517.workers.dev/',{
-   method:'POST',headers:{'Content-Type':'application/json'},
-   body:JSON.stringify({tipo:String(item.kind||'movie'),magnet_id:magnetId,file_path:filePath,token})
-  });
-  const result=await response.json().catch(()=>({}));
-  if(!response.ok||!result.url)throw new Error(result.error||'No se pudo preparar el enlace de reproducción.');
-  const media=new URL(result.url);
-  if(media.protocol!=='https:'&&media.protocol!=='http:')throw new Error('El enlace de reproducción no es válido.');
-  const intent='intent://'+media.host+media.pathname+media.search+'#Intent;scheme='+media.protocol.replace(':','')+';package=org.videolan.vlc;type=video/*;end';
-  popup.location.href=intent;
- }catch(error){
-  try{popup.close()}catch(e){}
-  console.error('Error reanudando AllDebrid:',error);
-  alert(error.message||'No se pudo abrir VLC.');
- }
-}
 function handleContinueClick(event,item){
- if(item.player!=='VLC')return;
- event.preventDefault();
- playAllDebridDirectly(item);
+ // AllDebrid usa la navegación normal al catálogo, que prepara y abre VLC automáticamente.
 }
 function render(){
  const items=read();root.replaceChildren();
@@ -133,7 +86,7 @@ function render(){
  items.forEach((item,index)=>{
   const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
   const continueUrl=getExternalPlaybackUrl(item);
-  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.target='_blank';poster.rel='noopener';poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));poster.addEventListener('click',e=>handleContinueClick(e,item));
+  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.target=item.player==='VLC'?'_self':'_blank';if(item.player!=='VLC')poster.rel='noopener';poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));poster.addEventListener('click',e=>handleContinueClick(e,item));
   const posterBox=document.createElement('div');posterBox.className='poster';
   if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';posterBox.append(img)}else{posterBox.textContent='▶'}
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';posterBox.append(badge);poster.append(posterBox);
@@ -144,8 +97,8 @@ function render(){
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
   link.href=continueUrl;
-  link.target='_blank';
-  link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
+  link.target=item.player==='VLC'?'_self':'_blank';
+  if(item.player!=='VLC')link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
   const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
   actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
  });
