@@ -14,14 +14,18 @@ html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,
 h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd;margin:0;max-width:450px}
 .content{position:relative;z-index:1;padding:20px;margin-top:320px;min-height:200px}
 .movie-row{display:grid;grid-template-columns:repeat(7,130px);gap:13px;align-items:start;margin-top:15px}
-.movie-card{width:130px;min-width:130px;max-width:130px;background:transparent;border:0;overflow:hidden}
-.poster{width:130px;height:180px;position:relative;overflow:hidden;border-radius:12px;background:#111}
-.poster img{display:block;width:130px;height:180px;object-fit:cover;border:3px solid transparent;border-radius:12px}
+.movie-card{width:130px;min-width:130px;max-width:130px;background:transparent;border:0;overflow:hidden;outline:none}
+.movie-card:focus,.movie-card:focus-visible{outline:none!important;box-shadow:none!important;border:0!important}
+.poster-link{display:block;width:130px;height:180px;position:relative;overflow:hidden;border-radius:12px;background:#111;text-decoration:none;outline:none}
+.poster-link:focus,.poster-link:focus-visible{outline:none!important;box-shadow:none!important}
+.poster img{display:block;width:130px;height:180px;object-fit:cover;border:0;border-radius:12px}
+.movie-card:focus .poster,.movie-card:focus-visible .poster,.poster-link:focus .poster,.poster-link:focus-visible .poster{outline:none!important;box-shadow:none!important;border:0!important}
 .player{position:absolute;top:7px;left:7px;padding:4px 6px;border-radius:4px;font-size:10px;font-weight:bold;background:#b51226;color:#fff}.player.vlc{background:#b66a16}
 .info{padding:7px 1px 0}.title{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta{font-size:10px;color:#aaa;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
-.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:6px 8px;font-size:10px;font-weight:bold;cursor:pointer}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}.remove{background:#292929;color:#ddd}
+.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}
+.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}.remove{background:#292929;color:#ddd}
 .empty{color:#aaa;font-size:14px;margin-top:18px}.empty strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
 .note{font-size:11px;color:#777;margin-top:24px}
 @media(max-width:900px){.movie-row{grid-template-columns:repeat(5,130px)}}
@@ -31,7 +35,9 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
  .content{margin-top:320px;padding:12px}
  .movie-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
  .movie-card{width:100%;min-width:0;max-width:130px}
+ .poster-link{width:100%;height:auto;aspect-ratio:2/3}
  .poster,.poster img{width:100%;height:auto;aspect-ratio:2/3}
+ .actions a,.actions button{min-height:44px;font-size:12px;padding:10px 8px}
  .title{font-size:11px}
 }
 </style>
@@ -55,17 +61,18 @@ function render(){
  header.style.backgroundImage=items[0]&&items[0].poster?'linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)),url("'+String(items[0].poster).replace(/["\\]/g,'')+'")':'none';
  if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio desde SHARKTV, aparecerá aquí.';root.append(e);return}
  items.forEach((item,index)=>{
-  const card=document.createElement('article');card.className='movie-card';
-  const poster=document.createElement('div');poster.className='poster';
-  if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';poster.append(img)}else{poster.textContent='▶'}
-  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';poster.append(badge);
+  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
+  const continueUrl=item.url||item.fallbackUrl||'#';
+  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));
+  const posterBox=document.createElement('div');posterBox.className='poster';
+  if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';posterBox.append(img)}else{posterBox.textContent='▶'}
+  const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';posterBox.append(badge);poster.append(posterBox);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
   const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Progreso no disponible')+(Number(item.position)>0?' · '+Math.floor(Number(item.position)/60)+' min reproducidos':'')+(item.repo?' · '+item.repo:'');
   const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
-  const continueUrl=item.url||item.fallbackUrl||'#';
   link.href=continueUrl;
   link.target='_self';
   link.rel='noopener';
@@ -73,6 +80,36 @@ function render(){
   actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
  });
 }
+function columns(){
+ const style=getComputedStyle(root);
+ const template=style.gridTemplateColumns;
+ return template&&template!=='none'?template.split(' ').length:1;
+}
+function cards(){return Array.from(root.querySelectorAll('.movie-card'))}
+root.addEventListener('keydown',e=>{
+ const card=e.target.closest('.movie-card');
+ if(!card)return;
+ const list=cards(),i=list.indexOf(card),cols=columns();
+ const key=e.key,code=e.keyCode||e.which;
+ let next=-1;
+ if(key==='ArrowRight'||code===22)next=Math.min(list.length-1,i+1);
+ else if(key==='ArrowLeft'||code===21)next=Math.max(0,i-1);
+ else if(key==='ArrowDown'||code===20)next=Math.min(list.length-1,i+cols);
+ else if(key==='ArrowUp'||code===19)next=Math.max(0,i-cols);
+ else if(key==='Enter'||key===' '||code===23||code===66){
+  if(e.target.closest('button'))return;
+  e.preventDefault();
+  const link=card.querySelector('.resume');
+  if(link&&link.href&&!link.href.endsWith('#'))link.click();
+  return;
+ }else return;
+ e.preventDefault();
+ if(next>=0&&list[next])list[next].focus({preventScroll:true});
+});
+root.addEventListener('focusin',e=>{
+ const card=e.target.closest('.movie-card');
+ if(card)card.scrollIntoView({block:'nearest',inline:'nearest'});
+});
 window.addEventListener('storage',render);render();
 </script>
 </body>
