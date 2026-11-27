@@ -9,16 +9,16 @@
 html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,sans-serif;overflow-x:hidden}
 .header{position:fixed;top:0;left:0;width:100%;height:520px;min-height:520px;background:#000 center/cover no-repeat;z-index:0;overflow:hidden;padding:20px;display:flex;align-items:flex-start}
 .header:before{content:"";position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.9) 0%,rgba(0,0,0,.55) 35%,transparent 100%),linear-gradient(to bottom,rgba(0,0,0,.12) 42%,rgba(0,0,0,.58) 68%,#000 100%);pointer-events:none}
-.header-info{position:absolute;top:160px;left:20px;z-index:2;max-width:500px;max-height:calc(100% - 24px);overflow:auto}
+.header-info{position:absolute;top:160px;left:20px;z-index:2;max-width:500px;max-height:calc(100% - 24px);overflow:auto;transform:translateY(-50%)}
 .brand{display:inline-block;color:#fff;font-size:23px;font-weight:900;letter-spacing:2px;text-decoration:none;margin-bottom:18px}.brand span{color:#e50914}
-h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd;margin:0;max-width:450px}
+h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd;margin:0;max-width:450px}.details{font-size:14px;font-weight:bold;margin:10px 0;line-height:1.7;max-width:480px}.overview{font-size:12px;line-height:1.45;max-width:450px;margin:8px 0 0;white-space:normal}
 .content{position:relative;z-index:1;padding:20px;margin-top:320px;min-height:200px}
 .movie-row{display:grid;grid-template-columns:repeat(7,130px);gap:13px;align-items:start;margin-top:15px}
 .movie-card{width:130px;min-width:130px;max-width:130px;background:transparent;border:0;overflow:hidden;outline:none}
 .movie-card:focus,.movie-card:focus-visible{outline:none!important;box-shadow:none!important;border:0!important}
 .poster-link{display:block;width:130px;height:180px;position:relative;overflow:hidden;border-radius:12px;background:#111;text-decoration:none;outline:none}
 .poster-link:focus,.poster-link:focus-visible{outline:none!important;box-shadow:none!important}
-.poster img{display:block;width:130px;height:180px;object-fit:cover;border:0;border-radius:12px}
+.poster img{display:block;width:130px;height:180px;object-fit:cover;border:3px solid transparent;border-radius:12px;transition:border-color .15s}.movie-card.selected .poster img,.poster-link:focus-visible .poster img{border-color:#e50914}
 .movie-card:focus .poster,.movie-card:focus-visible .poster,.poster-link:focus .poster,.poster-link:focus-visible .poster{outline:none!important;box-shadow:none!important;border:0!important}
 .player{position:absolute;top:7px;left:7px;width:29px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#b51226;color:#fff;box-shadow:0 1px 5px #0009}.player svg{display:block;width:20px;height:18px}.player.vlc{background:#fff}
 .info{padding:7px 1px 0}.title{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -26,12 +26,12 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
 .actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}\n.actions .remove{background:#292929;color:#ddd;flex:1;text-align:center;white-space:nowrap}
 .actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}\n.actions .remove:hover{background:#444}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}
-.empty{color:#aaa;font-size:14px;margin-top:18px}.empty strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
+.search-container{position:fixed;top:20px;right:30px;display:flex;align-items:center;gap:10px;z-index:1001}.search-button{background:transparent;border:0;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%}.search-button svg{width:26px;height:26px;fill:#fff}.search-input{width:0;min-width:0;padding:8px 0;border:0;border-radius:20px;background:rgba(0,0,0,.9);color:#fff;outline:none;opacity:0;pointer-events:none;transition:width .2s,opacity .2s,padding .2s}.search-input.active{width:220px;padding:9px 12px;border:1px solid rgba(255,255,255,.5);opacity:1;pointer-events:auto}.movie-card[hidden]{display:none!important}.empty{color:#aaa;font-size:14px;margin-top:18px}.empty strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
 .note{font-size:11px;color:#777;margin-top:24px}
 @media(max-width:900px){.movie-row{grid-template-columns:repeat(5,130px)}}
 @media(max-width:600px){
  .header{height:430px;min-height:430px;padding:15px}
- .header-info{top:160px;left:15px;right:15px}
+ .header-info{top:160px;left:15px;right:15px}.search-container{right:15px;top:15px}.search-input.active{width:170px}
  .content{margin-top:320px;padding:12px}
  .movie-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
  .movie-card{width:100%;min-width:0;max-width:130px}
@@ -53,7 +53,7 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 </main>
 <script>
 const KEY='sharktv_seguir_viendo_v1';
-const root=document.getElementById('items');
+const root=document.getElementById('items');\nconst searchInput=document.getElementById('search');\nconst searchButton=document.getElementById('search-button');\nconst heroTitle=document.getElementById('hero-title');\nconst heroMeta=document.getElementById('hero-meta');\nconst heroOverview=document.getElementById('hero-overview');\nfunction updateHero(item){if(!item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='Tus películas y series pendientes, reunidas en un solo lugar.';return}heroTitle.textContent=item.title||'Contenido';heroMeta.textContent=[item.year,item.quality,item.ageRating].filter(Boolean).join(' · ');heroOverview.textContent=item.overview||item.description||'Contenido guardado en Seguir viendo.';const banner=item.backdrop||item.banner||item.poster;document.getElementById('header').style.backgroundImage=banner?'linear-gradient(to right,rgba(0,0,0,.35),rgba(0,0,0,.08)),url("'+String(banner).replace(/["\\\\]/g,'')+'")':'none'}\nsearchButton.addEventListener('click',()=>{searchInput.classList.toggle('active');if(searchInput.classList.contains('active'))searchInput.focus();else{searchInput.value='';filterItems()}});\nsearchInput.addEventListener('input',filterItems);\nfunction filterItems(){const q=searchInput.value.trim().toLocaleLowerCase('es');root.querySelectorAll('.movie-card').forEach(card=>{card.hidden=!card.dataset.search.includes(q)})}
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
 function getExternalPlaybackUrl(item){
@@ -162,7 +162,7 @@ function render(){
  header.style.backgroundImage=items[0]&&items[0].poster?'linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)),url("'+String(items[0].poster).replace(/["\\]/g,'')+'")':'none';
  if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio desde SHARKTV, aparecerá aquí.';root.append(e);return}
  items.forEach((item,index)=>{
-  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
+  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',()=>{card.classList.add('selected');updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
   const continueUrl=getExternalPlaybackUrl(item);
   const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.target=item.player==='VLC'?'_self':'_blank';if(item.player!=='VLC')poster.rel='noopener';poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));poster.addEventListener('click',e=>handleContinueClick(e,item));
   const posterBox=document.createElement('div');posterBox.className='poster';
