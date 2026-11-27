@@ -176,8 +176,8 @@ function render(){
  if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio desde SHARKTV, aparecerá aquí.';root.append(e);return}
  items.forEach((item,index)=>{
   const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',()=>{card.classList.add('selected');updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
-  const continueUrl=getExternalPlaybackUrl(item);
-  const poster=document.createElement('a');poster.className='poster-link';poster.href=continueUrl;poster.target=item.player==='VLC'?'_self':'_blank';if(item.player!=='VLC')poster.rel='noopener';poster.setAttribute('aria-label','Continuar '+(item.title||'contenido'));poster.addEventListener('click',e=>handleContinueClick(e,item));
+  const fichaUrl=getFichaUrl(item);
+  const poster=document.createElement('a');poster.className='poster-link';poster.href=fichaUrl;poster.target='_self';poster.setAttribute('aria-label','Ver información de '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
   if(item.poster){const img=document.createElement('img');img.src=item.poster;img.alt=item.title||'Carátula';img.loading='lazy';posterBox.append(img)}else{posterBox.textContent='▶'}
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');
