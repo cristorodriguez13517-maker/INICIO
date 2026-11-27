@@ -183,7 +183,7 @@ function render(){
  if(!items.length){emptyState.hidden=false;return}
  emptyState.hidden=true;
  items.forEach((item,index)=>{
-  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');const selectCard=()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected')};card.addEventListener('click',e=>{if(!e.target.closest('.actions'))selectCard()});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
+  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
   const fichaUrl=getFichaUrl(item);
   const poster=document.createElement('a');poster.className='poster-link';poster.href=fichaUrl;poster.target='_self';poster.setAttribute('aria-label','Ver información de '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
