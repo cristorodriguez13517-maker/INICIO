@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SHARKTV - Seguir viendo</title>
+<title>Seguir viendo</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,sans-serif;overflow-x:hidden}
@@ -48,7 +48,7 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 <body>
 <div class="search-container"><button id="search-button" class="search-button" type="button" aria-label="Abrir buscador"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z"/></svg></button><input id="search" class="search-input" type="text" placeholder="Buscar película o serie..." aria-label="Buscar contenido" autocomplete="off"></div>
 <header class="header" id="header"><div class="header-info">
-<a class="brand" href="./">SHARK<span>TV</span></a>
+
 <h1 id="hero-title">▶ Seguir viendo</h1>
 <div id="hero-meta" class="details"></div>
 <p id="hero-overview" class="overview">Tus películas y series pendientes, reunidas en un solo lugar.</p>
@@ -181,7 +181,7 @@ function render(){
  const items=read();root.replaceChildren();
  const header=document.getElementById('header');
  header.style.backgroundImage=items[0]&&items[0].poster?'linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)),url("'+String(items[0].poster).replace(/["\\]/g,'')+'")':'none';
- if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio desde SHARKTV, aparecerá aquí.';root.append(e);return}
+ if(!items.length){const e=document.createElement('div');e.className='empty';e.innerHTML='<strong>Aún no tienes nada pendiente</strong>Cuando inicies una película o episodio, aparecerá aquí.';root.append(e);return}
  items.forEach((item,index)=>{
   const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',()=>{card.classList.add('selected');updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
   const fichaUrl=getFichaUrl(item);
@@ -190,7 +190,7 @@ function render(){
   const posterUrl=getPosterUrl(item);
   if(posterUrl){
    const img=document.createElement('img');img.src=posterUrl;img.alt=item.title||'Carátula';img.loading='eager';img.decoding='async';
-   img.onerror=()=>{img.remove();posterBox.classList.add('poster-missing');posterBox.textContent='SHARKTV';};
+   img.onerror=()=>{img.remove();posterBox.classList.add('poster-missing');posterBox.textContent='';};
    posterBox.append(img);
   }else{posterBox.classList.add('poster-missing');posterBox.textContent='SHARKTV';}
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');
