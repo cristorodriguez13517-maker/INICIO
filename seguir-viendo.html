@@ -43,7 +43,6 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
  .actions a,.actions button{min-height:0;font-size:12px;padding:8px 10px}
  .title{font-size:11px}
 }
-#hero-title{display:none!important}
 </style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
@@ -65,7 +64,7 @@ const heroTitle=document.getElementById('hero-title');
 const heroMeta=document.getElementById('hero-meta');
 const heroOverview=document.getElementById('hero-overview');
 const emptyState=document.getElementById('empty-state');
-function updateHero(item){if(!item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='Tus películas y series pendientes, reunidas en un solo lugar.';return}heroTitle.replaceChildren();if(item.logo){const logo=document.createElement('img');logo.className='hero-logo';logo.src=item.logo;logo.alt=item.title||'Logotipo';logo.onerror=()=>{logo.remove();heroTitle.textContent=item.title||'Contenido'};heroTitle.append(logo)}else heroTitle.textContent=item.title||'Contenido';heroMeta.textContent=[item.year,item.quality,item.ageRating].filter(Boolean).join(' · ');heroOverview.textContent=item.overview||item.description||'';const banner=item.backdrop||item.banner||item.poster;document.getElementById('header').style.backgroundImage=banner?'linear-gradient(to right,rgba(0,0,0,.35),rgba(0,0,0,.08)),url("'+String(banner).replace(/["\\\\]/g,'')+'")':'none'}
+function updateHero(item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='';document.getElementById('header').style.backgroundImage='none'}
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
 function getPosterUrl(item){
