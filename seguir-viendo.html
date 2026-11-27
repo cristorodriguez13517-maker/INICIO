@@ -90,7 +90,7 @@ function getFichaUrl(item){
  if(item.resumeUrl&&/series\.html\?id=/i.test(item.resumeUrl))return item.resumeUrl;
  if(item.seriesId)return base+'series.html?id='+encodeURIComponent(item.seriesId);
  if(repo==='SERIES'&&item.kind==='episode'){
-  let seriesId=String(item.id||'').replace(/^SERIES\\|/,'').split('|')[0];
+  let seriesId=String(item.id||'').replace(/^SERIES\|/,'').split('|')[0];
   if(seriesId)return base+'series.html?id='+encodeURIComponent(seriesId);
  }
  // El ID compuesto de AllDebrid incluye también el archivo; la ficha se busca por el ID de catálogo.
