@@ -24,8 +24,8 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 .info{padding:7px 1px 0}.title{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta{font-size:10px;color:#aaa;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
-.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}\n.actions .details-link{background:#292929;color:#fff;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;white-space:nowrap}
-.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}\n.actions .details-link:hover{background:#444}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}.remove{background:#292929;color:#ddd}
+.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}\n.actions .remove{background:#292929;color:#ddd;flex:1;text-align:center;white-space:nowrap}
+.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}\n.actions .remove:hover{background:#444}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}
 .empty{color:#aaa;font-size:14px;margin-top:18px}.empty strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
 .note{font-size:11px;color:#777;margin-top:24px}
 @media(max-width:900px){.movie-row{grid-template-columns:repeat(5,130px)}}
@@ -177,9 +177,8 @@ function render(){
   link.href=continueUrl;
   link.target=item.player==='VLC'?'_self':'_blank';
   if(item.player!=='VLC')link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
-  const ficha=document.createElement('a');ficha.className='details-link';ficha.textContent='Ver ficha';ficha.href=getFichaUrl(item);ficha.target='_self';ficha.setAttribute('aria-label','Ver ficha de '+(item.title||'contenido'));
-  const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
-  actions.append(link,ficha,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
+  const del=document.createElement('button');del.className='remove';del.textContent='Quitar de Seguir viendo';del.setAttribute('aria-label','Quitar '+(item.title||'contenido')+' de Seguir viendo');del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
+  actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
  });
 }
 function columns(){
