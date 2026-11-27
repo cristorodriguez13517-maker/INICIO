@@ -24,8 +24,10 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 .info{padding:7px 1px 0}.title{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta{font-size:10px;color:#aaa;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
-.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}\n.actions .remove{background:#292929;color:#ddd;flex:1;text-align:center;white-space:nowrap}
-.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}\n.actions .remove:hover{background:#444}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}
+.actions{display:flex;gap:6px}.actions a,.actions button{border:0;border-radius:4px;padding:8px 10px;min-height:36px;font-size:11px;font-weight:bold;cursor:pointer;outline:none}
+.actions .remove{background:#292929;color:#ddd;flex:1;text-align:center;white-space:nowrap}
+.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important}
+.actions .remove:hover{background:#444}.resume{background:#e50914;color:#fff;flex:1;text-align:center;text-decoration:none}
 .search-container{position:fixed;top:20px;right:30px;display:flex;align-items:center;gap:10px;z-index:1001}.search-button{background:transparent;border:0;padding:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%}.search-button svg{width:26px;height:26px;fill:#fff}.search-input{width:0;min-width:0;padding:8px 0;border:0;border-radius:20px;background:rgba(0,0,0,.9);color:#fff;outline:none;opacity:0;pointer-events:none;transition:width .2s,opacity .2s,padding .2s}.search-input.active{width:220px;padding:9px 12px;border:1px solid rgba(255,255,255,.5);opacity:1;pointer-events:auto}.movie-card[hidden]{display:none!important}.empty{color:#aaa;font-size:14px;margin-top:18px}.empty strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
 .note{font-size:11px;color:#777;margin-top:24px}
 @media(max-width:900px){.movie-row{grid-template-columns:repeat(5,130px)}}
@@ -44,16 +46,27 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
+<div class="search-container"><button id="search-button" class="search-button" type="button" aria-label="Abrir buscador"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z"/></svg></button><input id="search" class="search-input" type="text" placeholder="Buscar película o serie..." aria-label="Buscar contenido" autocomplete="off"></div>
 <header class="header" id="header"><div class="header-info">
 <a class="brand" href="./">SHARK<span>TV</span></a>
-<h1>▶ Seguir viendo</h1>
-<p class="sub">Tus películas y series pendientes, reunidas en un solo lugar.</p>
+<h1 id="hero-title">▶ Seguir viendo</h1>
+<div id="hero-meta" class="details"></div>
+<p id="hero-overview" class="overview">Tus películas y series pendientes, reunidas en un solo lugar.</p>
 </div></header>
 <main class="content"><section class="movie-row" id="items" aria-live="polite"></section>
 </main>
 <script>
 const KEY='sharktv_seguir_viendo_v1';
-const root=document.getElementById('items');\nconst searchInput=document.getElementById('search');\nconst searchButton=document.getElementById('search-button');\nconst heroTitle=document.getElementById('hero-title');\nconst heroMeta=document.getElementById('hero-meta');\nconst heroOverview=document.getElementById('hero-overview');\nfunction updateHero(item){if(!item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='Tus películas y series pendientes, reunidas en un solo lugar.';return}heroTitle.textContent=item.title||'Contenido';heroMeta.textContent=[item.year,item.quality,item.ageRating].filter(Boolean).join(' · ');heroOverview.textContent=item.overview||item.description||'Contenido guardado en Seguir viendo.';const banner=item.backdrop||item.banner||item.poster;document.getElementById('header').style.backgroundImage=banner?'linear-gradient(to right,rgba(0,0,0,.35),rgba(0,0,0,.08)),url("'+String(banner).replace(/["\\\\]/g,'')+'")':'none'}\nsearchButton.addEventListener('click',()=>{searchInput.classList.toggle('active');if(searchInput.classList.contains('active'))searchInput.focus();else{searchInput.value='';filterItems()}});\nsearchInput.addEventListener('input',filterItems);\nfunction filterItems(){const q=searchInput.value.trim().toLocaleLowerCase('es');root.querySelectorAll('.movie-card').forEach(card=>{card.hidden=!card.dataset.search.includes(q)})}
+const root=document.getElementById('items');
+const searchInput=document.getElementById('search');
+const searchButton=document.getElementById('search-button');
+const heroTitle=document.getElementById('hero-title');
+const heroMeta=document.getElementById('hero-meta');
+const heroOverview=document.getElementById('hero-overview');
+function updateHero(item){if(!item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='Tus películas y series pendientes, reunidas en un solo lugar.';return}heroTitle.textContent=item.title||'Contenido';heroMeta.textContent=[item.year,item.quality,item.ageRating].filter(Boolean).join(' · ');heroOverview.textContent=item.overview||item.description||'Contenido guardado en Seguir viendo.';const banner=item.backdrop||item.banner||item.poster;document.getElementById('header').style.backgroundImage=banner?'linear-gradient(to right,rgba(0,0,0,.35),rgba(0,0,0,.08)),url("'+String(banner).replace(/["\\\\]/g,'')+'")':'none'}
+searchButton.addEventListener('click',()=>{searchInput.classList.toggle('active');if(searchInput.classList.contains('active'))searchInput.focus();else{searchInput.value='';filterItems()}});
+searchInput.addEventListener('input',filterItems);
+function filterItems(){const q=searchInput.value.trim().toLocaleLowerCase('es');root.querySelectorAll('.movie-card').forEach(card=>{card.hidden=!card.dataset.search.includes(q)})}
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
 function getExternalPlaybackUrl(item){
