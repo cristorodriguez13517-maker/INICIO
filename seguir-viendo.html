@@ -50,7 +50,7 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 <p class="sub">Tus películas y series pendientes, reunidas en un solo lugar.</p>
 </div></header>
 <main class="content"><section class="movie-row" id="items" aria-live="polite"></section>
-<p class="note">El progreso se guarda cuando el contenido se reproduce en el reproductor interno de SHARKTV. Se conserva en este dispositivo.</p></main>
+</main>
 <script>
 const KEY='sharktv_seguir_viendo_v1';
 const root=document.getElementById('items');
@@ -170,15 +170,14 @@ function render(){
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');badge.textContent=item.player==='VLC'?'AllDebrid · VLC':'YouTube · SmartTube';posterBox.append(badge);poster.append(posterBox);
   const info=document.createElement('div');info.className='info';
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
-  const meta=document.createElement('div');meta.className='meta';meta.textContent=(Number(item.percent)>0?(Number(item.percent)+'% visto'):'Progreso no disponible')+(Number(item.position)>0?' · '+Math.floor(Number(item.position)/60)+' min reproducidos':'')+(item.repo?' · '+item.repo:'');
-  const bar=document.createElement('div');bar.className='progress';const fill=document.createElement('span');fill.style.width=Math.max(0,Math.min(99,Number(item.percent)||0))+'%';bar.append(fill);
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=item.repo||'';
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
   link.href=continueUrl;
   link.target=item.player==='VLC'?'_self':'_blank';
   if(item.player!=='VLC')link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
-  const del=document.createElement('button');del.className='remove';del.textContent='Quitar de Seguir viendo';del.setAttribute('aria-label','Quitar '+(item.title||'contenido')+' de Seguir viendo');del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
-  actions.append(link,del);info.append(title,meta,bar,actions);card.append(poster,info);root.append(card);
+  const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.setAttribute('aria-label','Quitar '+(item.title||'contenido'));del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
+  actions.append(link,del);info.append(title,meta,actions);card.append(poster,info);root.append(card);
  });
 }
 function columns(){
