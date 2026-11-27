@@ -90,7 +90,7 @@ function getFichaUrl(item){
  if(item.resumeUrl&&/series\.html\?id=/i.test(item.resumeUrl))return item.resumeUrl;
  if(item.seriesId)return base+'series.html?id='+encodeURIComponent(item.seriesId);
  // El ID compuesto de AllDebrid incluye también el archivo; la ficha se busca por el ID de catálogo.
- let id=String(item.id||'');
+ let id=String(item.catalogId||item.id||'');
  if(id.startsWith(repo+'|'))id=id.slice(repo.length+1);
  id=id.split('|')[0];
  return id?base+'?shark_ficha='+encodeURIComponent(id):(item.resumeUrl||base);
