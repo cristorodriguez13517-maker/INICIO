@@ -198,7 +198,7 @@ function render(){
   const title=document.createElement('div');title.className='title';title.textContent=item.title||'Sin título';
   const actions=document.createElement('div');actions.className='actions';
   const link=document.createElement('a');link.className='resume';link.textContent='Continuar';
-  link.href=continueUrl;
+  link.href=getExternalPlaybackUrl(item);
   link.target=item.player==='VLC'?'_self':'_blank';
   if(item.player!=='VLC')link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
   const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.setAttribute('aria-label','Quitar '+(item.title||'contenido'));del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
