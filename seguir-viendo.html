@@ -59,7 +59,10 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
 <script>
 const KEY='sharktv_seguir_viendo_v1';
 const root=document.getElementById('items');
-)}
+const heroTitle=document.getElementById('hero-title');
+const heroMeta=document.getElementById('hero-meta');
+const heroOverview=document.getElementById('hero-overview');
+function updateHero(item){if(!item){heroTitle.textContent='▶ Seguir viendo';heroMeta.textContent='';heroOverview.textContent='Tus películas y series pendientes, reunidas en un solo lugar.';return}heroTitle.textContent=item.title||'Contenido';heroMeta.textContent=[item.year,item.quality,item.ageRating].filter(Boolean).join(' · ');heroOverview.textContent=item.overview||item.description||'Contenido guardado en Seguir viendo.';const banner=item.backdrop||item.banner||item.poster;document.getElementById('header').style.backgroundImage=banner?'linear-gradient(to right,rgba(0,0,0,.35),rgba(0,0,0,.08)),url("'+String(banner).replace(/["\\\\]/g,'')+'")':'none'}
 function read(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
 function save(items){localStorage.setItem(KEY,JSON.stringify(items))}
 function getPosterUrl(item){
