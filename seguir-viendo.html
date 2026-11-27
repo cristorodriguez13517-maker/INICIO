@@ -67,7 +67,7 @@ function getExternalPlaybackUrl(item){
   };
   const base=bases[repo]||bases['ALLDEBRID-PELICULAS'];
   const params=new URLSearchParams({shark_magnet:String(item.magnetId),shark_path:String(item.filePath),shark_kind:String(item.kind||'movie')});
-  if(repo==='ALLDEBRID-SERIES'&&item.seriesId){
+  if((repo==='ALLDEBRID-SERIES'||repo==='ALLDEBRID-KIDS')&&item.seriesId){
    return base+'series.html?id='+encodeURIComponent(item.seriesId)+'&'+params.toString();
   }
   return base+'?'+params.toString();
