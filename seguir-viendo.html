@@ -41,6 +41,7 @@ h1{font-size:28px;margin:0 0 10px}.sub{font-size:13px;line-height:1.5;color:#ddd
  .title{font-size:11px}
 }
 </style>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
 <header class="header" id="header"><div class="header-info">
@@ -99,8 +100,61 @@ function getFichaUrl(item){
  id=id.split('|')[0];
  return id?base+'?shark_ficha='+encodeURIComponent(id):(item.resumeUrl||base);
 }
-function handleContinueClick(event,item){
- // AllDebrid usa la navegación normal al catálogo, que prepara y abre VLC automáticamente.
+const ALLDEBRID_WORKER_URL='https://alldebrid-vlc.cristorodriguez13517.workers.dev/';
+const ALLDEBRID_TURNSTILE_KEY='0x4AAAAAAGK-CFVW1ivlcFRe';
+let continueTurnstileId=null,continueTurnstileResolve=null,continueTurnstileReject=null,continueBusy=false;
+async function obtenerTokenContinuar(){
+ const limit=Date.now()+15000;
+ while(!window.turnstile&&Date.now()<limit)await new Promise(r=>setTimeout(r,100));
+ if(!window.turnstile)throw new Error('No se pudo cargar la verificación de Cloudflare.');
+ let host=document.getElementById('continue-turnstile');
+ if(!host){host=document.createElement('div');host.id='continue-turnstile';host.style.cssText='position:fixed;left:-10000px;top:-10000px;width:0;height:0;overflow:hidden';document.body.appendChild(host)}
+ if(continueTurnstileId===null){
+  continueTurnstileId=window.turnstile.render(host,{
+   sitekey:ALLDEBRID_TURNSTILE_KEY,action:'reproducir',execution:'execute',size:'invisible',appearance:'interaction-only',
+   callback:token=>{if(continueTurnstileResolve){const done=continueTurnstileResolve;continueTurnstileResolve=null;continueTurnstileReject=null;done(token)}},
+   'error-callback':code=>{if(continueTurnstileReject){const fail=continueTurnstileReject;continueTurnstileResolve=null;continueTurnstileReject=null;fail(new Error('Cloudflare Turnstile: '+(code||'error de verificación')))}},
+   'unsupported-callback':()=>{if(continueTurnstileReject){const fail=continueTurnstileReject;continueTurnstileResolve=null;continueTurnstileReject=null;fail(new Error('Este navegador no admite la verificación de Cloudflare.'))}},
+   'timeout-callback':()=>{if(continueTurnstileReject){const fail=continueTurnstileReject;continueTurnstileResolve=null;continueTurnstileReject=null;fail(new Error('La verificación de Cloudflare ha agotado el tiempo.'))}},
+   'expired-callback':()=>{if(continueTurnstileReject){const fail=continueTurnstileReject;continueTurnstileResolve=null;continueTurnstileReject=null;fail(new Error('La verificación ha caducado. Vuelve a pulsar Continuar.'))}}
+  });
+ }
+ return new Promise((resolve,reject)=>{
+  continueTurnstileResolve=resolve;continueTurnstileReject=reject;
+  window.turnstile.reset(continueTurnstileId);window.turnstile.execute(continueTurnstileId);
+  setTimeout(()=>{if(continueTurnstileReject===reject){continueTurnstileResolve=null;continueTurnstileReject=null;reject(new Error('La verificación está tardando demasiado.'))}},30000);
+ });
+}
+function abrirEnVLC(url){
+ const u=new URL(url);
+ if(u.protocol!=='https:'&&u.protocol!=='http:')throw new Error('AllDebrid devolvió un enlace no válido.');
+ if(/Android/i.test(navigator.userAgent)){
+  const intent='intent://'+u.host+u.pathname+u.search+'#Intent;scheme='+u.protocol.slice(0,-1)+';package=org.videolan.vlc;type=video/*;S.browser_fallback_url='+encodeURIComponent(u.href)+';end';
+  location.href=intent;
+ }else location.href=u.href;
+}
+async function handleContinueClick(event,item){
+ if(item.player!=='VLC')return;
+ event.preventDefault();
+ if(continueBusy)return;
+ if(!item.magnetId||!item.filePath){alert('Este elemento no tiene guardados el identificador y el archivo de AllDebrid. Abre su ficha y vuelve a seleccionarlo para actualizar Seguir viendo.');return}
+ continueBusy=true;
+ const link=event.currentTarget,original=link.textContent;
+ link.textContent='Preparando enlace…';
+ try{
+  const token=await obtenerTokenContinuar();
+  const response=await fetch(ALLDEBRID_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo:item.kind||'movie',magnet_id:String(item.magnetId),file_path:String(item.filePath),token})});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||!result.url)throw new Error(result.error||'AllDebrid no ha podido generar el enlace directo.');
+  abrirEnVLC(result.url);
+ }catch(error){
+  console.error('SHARKTV Seguir viendo / AllDebrid:',error);
+  alert(error.message||'No se pudo abrir el enlace directo en VLC.');
+  link.textContent=original;
+ }finally{
+  continueBusy=false;
+  if(window.turnstile&&continueTurnstileId!==null)window.turnstile.reset(continueTurnstileId);
+ }
 }
 function render(){
  const items=read();root.replaceChildren();
