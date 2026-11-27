@@ -232,54 +232,6 @@ root.addEventListener('focusin',e=>{
 });
 window.addEventListener('storage',render);render();
 </script>
-<script id="shark-hide-posters-below-synopsis">
-(function(){
- const mq=window.matchMedia('(max-width:600px) and (orientation:portrait)');
- let raf=0,observer=null,bound=new WeakSet(),resizeObserver=null;
- function getCards(){return Array.from(document.querySelectorAll('#items .movie-card'))}
- function getSynopsis(){return document.querySelector('#hero-overview')||document.querySelector('.header-info .overview')}
- function update(){
-  raf=0;
-  const cards=getCards();
-  if(!mq.matches){
-   cards.forEach(card=>{card.style.removeProperty('opacity');card.style.removeProperty('transition');card.style.removeProperty('pointer-events')});
-   return;
-  }
-  const synopsis=getSynopsis();
-  if(!synopsis)return;
-  const boundary=synopsis.getBoundingClientRect().top;
-  const hideBefore=300;
-  cards.forEach(card=>{
-   const bottom=card.getBoundingClientRect().bottom;
-   const visible=bottom>boundary+hideBefore?1:0;
-   card.style.setProperty('transition','none');
-   card.style.setProperty('opacity',String(visible),'important');
-   card.style.setProperty('pointer-events',visible===0?'none':'auto');
-  });
- }
- function request(){if(!raf)raf=requestAnimationFrame(update)}
- function bindScroll(){
-  window.addEventListener('scroll',request,{passive:true,capture:true});
-  document.addEventListener('scroll',request,{passive:true,capture:true});
-  document.addEventListener('touchmove',request,{passive:true});
-  if(window.visualViewport)window.visualViewport.addEventListener('scroll',request,{passive:true});
- }
- function init(){
-  bindScroll();
-  if(observer)observer.disconnect();
-  observer=new MutationObserver(()=>{request()});
-  observer.observe(document.body,{childList:true,subtree:true,characterData:true});
-  if(window.ResizeObserver){
-   resizeObserver=new ResizeObserver(request);
-   const synopsis=getSynopsis();if(synopsis)resizeObserver.observe(synopsis);
-   const items=document.getElementById('items');if(items)resizeObserver.observe(items);
-  }
-  request();
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
- if(mq.addEventListener)mq.addEventListener('change',request);else mq.addListener(request);
- window.addEventListener('resize',request,{passive:true});
-})();
-</script>
+<script id="shark-hide-posters-below-synopsis">(function(){/* Desactivado: mantener siempre visibles las carátulas de Seguir viendo. */})();</script>
 </body>
 </html>
