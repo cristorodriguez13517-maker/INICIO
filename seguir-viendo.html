@@ -194,8 +194,14 @@ function getSeriesIdentity(item){
  return id?'serie:'+id.toLowerCase():'';
 }
 function getVisibleItems(items){
+ const maxAge=15*24*60*60*1000,now=Date.now();
+ const fresh=items.filter(item=>{
+  const updated=Number(item&&item.updatedAt);
+  return !Number.isFinite(updated)||updated<=0||(now-updated)<maxAge;
+ });
+ if(fresh.length!==items.length)save(fresh);
  const seen=new Set(),visible=[];
- for(const item of items){
+ for(const item of fresh){
   const identity=getSeriesIdentity(item);
   if(identity&&seen.has(identity))continue;
   if(identity)seen.add(identity);
