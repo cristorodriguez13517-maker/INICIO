@@ -189,7 +189,7 @@ function getSeriesIdentity(item){
  let id=String(item.seriesId||'').trim();
  if(!id){
   id=String(item.id||'').replace(/^(?:ALLDEBRID-SERIES|SERIES)\|/i,'');
-  id=id.split(/\|S\\d+E\\d+/i)[0].split('|')[0];
+  id=id.split(/\|S\d+E\d+/i)[0].split('|')[0];
  }
  return id?'serie:'+id.toLowerCase():'';
 }
