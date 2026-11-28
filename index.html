@@ -420,28 +420,24 @@ a, button {
 
         
 
+        <a href="https://cristorodriguez13517-maker.github.io/INICIO/seguir-viendo.html"
+           class="menu-item">
+          Seguir viendo
+        </a>
+
         <a href="https://cristorodriguez13517-maker.github.io/ALLDEBRID-PELICULAS/"
            class="menu-item">
           Películas 
         </a>
-
-       
 
         <a href="https://cristorodriguez13517-maker.github.io/ALLDEBRID-SERIES/"
            class="menu-item">
           Series 
         </a>
 
-       
-
         <a href="https://cristorodriguez13517-maker.github.io/ALLDEBRID-KIDS/"
            class="menu-item">
           Kids 
-        </a>
-
-        <a href="https://cristorodriguez13517-maker.github.io/INICIO/seguir-viendo.html"
-           class="menu-item">
-          Seguir viendo
         </a>
 
         <a href="https://dondeverfutbolhoy.com/" 
@@ -981,6 +977,10 @@ function actualizarSeleccion() {
 }
 
 
+// Marcar Seguir viendo desde que se carga el menú.
+actualizarSeleccion();
+
+
 /* =========================================
    AVISO PRÓXIMAMENTE
 ========================================= */
@@ -1074,9 +1074,8 @@ document.addEventListener("keydown", function(e) {
 
       mostrarMenu();
 
-      // En TV, abrir el menú no selecciona ninguna categoría.
-      // La opción se marca solo al pulsar arriba o abajo de nuevo.
-      selectedIndex = -1;
+      // Al abrir el menú, Seguir viendo permanece seleccionada.
+      selectedIndex = 0;
       actualizarSeleccion();
 
       return;
