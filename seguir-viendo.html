@@ -27,8 +27,8 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
 .actions{display:flex;align-items:center;gap:6px;width:max-content;max-width:100%}.actions a,.actions button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;border:0;border-radius:4px;padding:7px 11px;min-height:0;font-size:11px;line-height:1.2;font-weight:bold;cursor:pointer;outline:none;white-space:nowrap}
 .actions .remove{background:#292929;color:#ddd;text-align:center;white-space:nowrap}
-.actions a,.actions button{position:relative;transition:transform .16s ease,background-color .16s ease,box-shadow .16s ease}
-.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:2px solid #fff!important;outline-offset:3px;box-shadow:0 0 0 3px #e50914!important;transform:scale(1.16);z-index:5}
+.actions a,.actions button{position:relative;transition:transform .14s ease,background-color .14s ease,box-shadow .14s ease}
+.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:0 0 0 2px #e50914!important;transform:scale(1.06);z-index:5}
 .actions .remove:hover,.actions .remove:focus{background:#555;color:#fff}.resume{background:#e50914;color:#fff;text-align:center;text-decoration:none}
 .movie-card:focus-within{position:relative;z-index:3}
 .movie-card:focus-within .actions a,.movie-card:focus-within .actions button{cursor:pointer}
@@ -225,22 +225,29 @@ root.addEventListener('keydown',e=>{
  const resume=card.querySelector('.resume');
  const remove=card.querySelector('.remove');
  const target=e.target;
- const isAction=target===resume||target===remove;
+ const isResume=target===resume,isRemove=target===remove;
+ const left=key==='ArrowLeft'||code===21,right=key==='ArrowRight'||code===22;
+ const up=key==='ArrowUp'||code===19,down=key==='ArrowDown'||code===20;
  if(key==='Enter'||key===' '||code===23||code===66){
-  if(target===card){e.preventDefault();if(poster)poster.click();return}
+  if(target===card){e.preventDefault();if(poster)poster.click()}
   return;
  }
- let nextCard=null;
- if(key==='ArrowRight'||code===22)nextCard=list[Math.min(list.length-1,i+1)];
- else if(key==='ArrowLeft'||code===21)nextCard=list[Math.max(0,i-1)];
- else if((key==='ArrowDown'||code===20)&&!isAction){e.preventDefault();if(resume)resume.focus();return}
- else if((key==='ArrowDown'||code===20)&&target===resume){e.preventDefault();if(remove)remove.focus();return}
- else if((key==='ArrowUp'||code===19)&&target===remove){e.preventDefault();if(resume)resume.focus();return}
- else if((key==='ArrowUp'||code===19)&&isAction){e.preventDefault();card.focus();return}
- else if(key==='ArrowUp'||code===19){nextCard=list[Math.max(0,i-columns())]}
- else return;
+ if(!(left||right||up||down))return;
  e.preventDefault();
- if(nextCard)nextCard.focus();
+ let destination=null;
+ if(left||right){
+  const next=list[i+(right?1:-1)];
+  if(next)destination=isResume?next.querySelector('.resume'):isRemove?next.querySelector('.remove'):next.querySelector('.poster-link');
+ }else if(down){
+  if(!isResume&&!isRemove)destination=resume;
+  else if(isResume)destination=remove;
+  else destination=list[i+columns()]?.querySelector('.remove')||null;
+ }else if(up){
+  if(isRemove)destination=resume;
+  else if(isResume)destination=poster;
+  else destination=list[i-columns()]?.querySelector('.poster-link')||null;
+ }
+ if(destination)destination.focus();
 });
 root.addEventListener('focusin',e=>{
  const card=e.target.closest('.movie-card');
