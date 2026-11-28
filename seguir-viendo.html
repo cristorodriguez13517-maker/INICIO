@@ -193,8 +193,8 @@ function render(){
   const poster=document.createElement('a');poster.className='poster-link';poster.href=fichaUrl;poster.target='_self';poster.setAttribute('aria-label','Ver información de '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
   const posterUrl=getPosterUrl(item);if(posterUrl){const img=document.createElement('img');img.src=posterUrl;img.alt=item.title||'Carátula';img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';img.addEventListener('error',()=>{img.remove();if(!posterBox.querySelector('img'))posterBox.classList.add('poster-unavailable')},{once:true});posterBox.append(img)}else{posterBox.classList.add('poster-unavailable')}
-  const episodeMatch=String(item.title||'').match(/(?:^|\b)T(\d+)\s*(?:·|-)\s*(?:E|C)(\d+)\b/i)||String(item.title||'').match(/\bT(\d+)\s*[- ]\s*E(\d+)\b/i)||String(item.id||'').match(/S(\d+)E(\d+)/i)||((item.season!=null||item.seasonNumber!=null)&&(item.episode!=null||item.episodeNumber!=null)?[null,String(item.season??item.seasonNumber),String(item.episode??item.episodeNumber)]:null);
-  if((item.repo==='SERIES'||item.repo==='ALLDEBRID-SERIES')&&episodeMatch){
+  const episodeText=[item.episodeLabel,item.title,item.id].filter(Boolean).join(' ');const episodeMatch=episodeText.match(/(?:^|\b)T\s*(\d+)\s*(?:·|-|–|_)\s*(?:E|C)\s*(\d+)\b/i)||episodeText.match(/\bT\s*(\d+)\s*[- ]\s*E\s*(\d+)\b/i)||episodeText.match(/S\s*(\d+)\s*E\s*(\d+)/i)||((item.season!=null||item.seasonNumber!=null)&&(item.episode!=null||item.episodeNumber!=null)?[null,String(item.season??item.seasonNumber),String(item.episode??item.episodeNumber)]:null);
+  if((item.kind==='episode'||item.repo==='SERIES'||item.repo==='ALLDEBRID-SERIES')&&episodeMatch){
    const episodeBadge=document.createElement('span');episodeBadge.className='continue-episode-number';episodeBadge.textContent='T'+episodeMatch[1]+' · C'+String(episodeMatch[2]).padStart(2,'0');posterBox.append(episodeBadge);
   }
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');
