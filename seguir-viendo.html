@@ -14,7 +14,7 @@ html,body{margin:0;min-height:100%;background:#000;color:#fff;font-family:Arial,
 h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;margin:0;max-width:450px}.details{font-size:14px;font-weight:bold;margin:3px 0;line-height:1.5;max-width:480px}.overview{font-size:12px;line-height:1.3;max-width:450px;margin:3px 0 0;white-space:normal}
 .content{position:relative;z-index:1;padding:0 20px 20px;margin-top:0;min-height:200px}
 .movie-row{display:grid;grid-template-columns:repeat(7,130px);gap:13px;align-items:start;margin-top:0}
-.movie-card{width:130px;min-width:130px;max-width:130px;background:transparent;border:0;overflow:hidden;outline:none}
+.movie-card{width:130px;min-width:130px;max-width:130px;background:transparent;border:0;overflow:visible;outline:none}
 .movie-card:focus,.movie-card:focus-visible{outline:none!important;box-shadow:none!important;border:0!important}
 .poster-link{display:block;width:130px;height:180px;position:relative;overflow:hidden;border-radius:12px;background:#111;text-decoration:none;outline:none}
 .poster-link:focus,.poster-link:focus-visible{outline:none!important;box-shadow:none!important}
@@ -28,7 +28,7 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
 .actions{display:flex;align-items:center;gap:6px;width:max-content;max-width:100%}.actions a,.actions button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;border:0;border-radius:4px;padding:7px 11px;min-height:0;font-size:11px;line-height:1.2;font-weight:bold;cursor:pointer;outline:none;white-space:nowrap}
 .actions .remove{background:#292929;color:#ddd;text-align:center;white-space:nowrap}
 .actions a,.actions button{position:relative;transition:transform .14s ease,background-color .14s ease,box-shadow .14s ease}
-.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:0 0 0 2px #e50914!important;transform:scale(1.06);z-index:5}
+.actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important;transform:scale(1.04);z-index:5}
 .actions .remove:hover,.actions .remove:focus{background:#555;color:#fff}.resume{background:#e50914;color:#fff;text-align:center;text-decoration:none}
 .movie-card:focus-within{position:relative;z-index:3}
 .movie-card:focus-within .actions a,.movie-card:focus-within .actions button{cursor:pointer}
