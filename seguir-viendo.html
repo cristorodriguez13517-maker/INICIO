@@ -248,7 +248,7 @@ root.addEventListener('keydown',e=>{
   else if(isResume)destination=remove;
   else destination=list[i+columns()]?.querySelector('.remove')||null;
  }else if(up){
-  if(isRemove)destination=resume;
+  if(isRemove)destination=poster;
   else if(isResume)destination=poster;
   else destination=list[i-columns()]?.querySelector('.poster-link')||null;
  }
