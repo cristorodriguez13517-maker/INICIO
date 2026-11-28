@@ -181,8 +181,30 @@ async function handleContinueClick(event,item){
   if(window.turnstile&&continueTurnstileId!==null)window.turnstile.reset(continueTurnstileId);
  }
 }
+function getSeriesIdentity(item){
+ if(!item)return '';
+ const kind=String(item.kind||'').toLowerCase();
+ const repo=String(item.repo||'').toUpperCase();
+ if(kind!=='episode'&&kind!=='series'&&repo!=='SERIES'&&repo!=='ALLDEBRID-SERIES')return '';
+ let id=String(item.seriesId||'').trim();
+ if(!id){
+  id=String(item.id||'').replace(/^(?:ALLDEBRID-SERIES|SERIES)\\|/i,'');
+  id=id.split(/\\|S\\d+E\\d+/i)[0].split('|')[0];
+ }
+ return id?'serie:'+id.toLowerCase():'';
+}
+function getVisibleItems(items){
+ const seen=new Set(),visible=[];
+ for(const item of items){
+  const identity=getSeriesIdentity(item);
+  if(identity&&seen.has(identity))continue;
+  if(identity)seen.add(identity);
+  visible.push(item);
+ }
+ return visible;
+}
 function render(){
- const items=read();root.replaceChildren();
+ const items=getVisibleItems(read());root.replaceChildren();
  const header=document.getElementById('header');
  header.style.backgroundImage=items[0]&&items[0].poster?'linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.25)),url("'+String(items[0].poster).replace(/["\\]/g,'')+'")':'none';
  if(!items.length){emptyState.hidden=false;return}
