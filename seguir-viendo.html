@@ -236,8 +236,12 @@ root.addEventListener('keydown',e=>{
  e.preventDefault();
  let destination=null;
  if(left||right){
-  const next=list[i+(right?1:-1)];
-  if(next)destination=isResume?next.querySelector('.resume'):isRemove?next.querySelector('.remove'):next.querySelector('.poster-link');
+  if(isResume&&right)destination=remove;
+  else if(isRemove&&left)destination=resume;
+  else{
+   const next=list[i+(right?1:-1)];
+   if(next)destination=isResume?next.querySelector('.resume'):isRemove?next.querySelector('.remove'):next.querySelector('.poster-link');
+  }
  }else if(down){
   if(!isResume&&!isRemove)destination=resume;
   else if(isResume)destination=remove;
