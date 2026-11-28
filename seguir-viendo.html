@@ -31,6 +31,7 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
 .actions a:focus,.actions button:focus,.actions a:focus-visible,.actions button:focus-visible{outline:none!important;box-shadow:none!important;transform:scale(1.04);z-index:5}
 .actions .remove:hover,.actions .remove:focus{background:#555;color:#fff}.resume{background:#e50914;color:#fff;text-align:center;text-decoration:none}
 .movie-card:focus-within{position:relative;z-index:3}
+.movie-card.actions-focused .poster img,.movie-card.actions-focused:focus-visible .poster img,.movie-card.actions-focused .poster-link:focus-visible img{border-color:transparent!important}
 .movie-card:focus-within .actions a,.movie-card:focus-within .actions button{cursor:pointer}
 .movie-card[hidden]{display:none!important}.empty{color:#aaa;font-size:13px;line-height:1.45;margin-top:14px;max-width:450px}.empty strong{display:block;color:#fff;font-size:16px;margin-bottom:5px}.empty[hidden]{display:none}
 .note{font-size:11px;color:#777;margin-top:24px}
@@ -187,7 +188,7 @@ function render(){
  if(!items.length){emptyState.hidden=false;return}
  emptyState.hidden=true;
  items.forEach((item,index)=>{
-  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
+  const card=document.createElement('article');card.className='movie-card';card.tabIndex=0;card.dataset.search=String((item.title||'')+' '+(item.repo||'')).toLocaleLowerCase('es');card.addEventListener('focusin',e=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');card.classList.toggle('actions-focused',!!e.target.closest('.actions'));updateHero(item)});card.addEventListener('mouseenter',()=>{root.querySelectorAll('.movie-card.selected').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');updateHero(item)});card.setAttribute('role','group');card.setAttribute('aria-label',(item.title||'Contenido')+'; usa las flechas para moverte y Enter para continuar');
   const fichaUrl=getFichaUrl(item);
   const poster=document.createElement('a');poster.className='poster-link';poster.href=fichaUrl;poster.target='_self';poster.setAttribute('aria-label','Ver información de '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
