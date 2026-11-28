@@ -234,7 +234,7 @@ function render(){
   link.href=getExternalPlaybackUrl(item);
   link.target=item.player==='VLC'?'_self':'_blank';
   if(item.player!=='VLC')link.rel='noopener';link.addEventListener('click',e=>handleContinueClick(e,item));
-  const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.setAttribute('aria-label','Quitar '+(item.title||'contenido'));del.addEventListener('click',()=>{const next=read();next.splice(index,1);save(next);render()});
+  const del=document.createElement('button');del.className='remove';del.textContent='Quitar';del.setAttribute('aria-label','Quitar '+(item.title||'contenido'));del.addEventListener('click',()=>{const identity=getSeriesIdentity(item);const next=read().filter(x=>identity?getSeriesIdentity(x)!==identity:String(x.id)!==String(item.id));save(next);render()});
   actions.append(link,del);info.append(actions);card.append(poster,info);root.append(card);
  });
 }
