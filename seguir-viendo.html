@@ -43,6 +43,7 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
  .actions a,.actions button{min-height:0;font-size:12px;padding:8px 10px}
  .title{font-size:11px}
 }
+.movie-card:focus-visible .poster img,.poster-link:focus-visible img{border-color:#e50914!important}
 </style>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
@@ -216,23 +217,27 @@ function cards(){return Array.from(root.querySelectorAll('.movie-card'))}
 root.addEventListener('keydown',e=>{
  const card=e.target.closest('.movie-card');
  if(!card)return;
- const list=cards(),i=list.indexOf(card),cols=columns();
- const key=e.key,code=e.keyCode||e.which;
- let next=-1;
- if(key==='ArrowRight'||code===22)next=Math.min(list.length-1,i+1);
- else if(key==='ArrowLeft'||code===21)next=Math.max(0,i-1);
- else if(key==='ArrowDown'||code===20)next=Math.min(list.length-1,i+cols);
- else if(key==='ArrowUp'||code===19)next=Math.max(0,i-cols);
- else if(key==='Enter'||key===' '||code===23||code===66){
-  if(e.target.closest('button'))return;
-  e.preventDefault();
-  if(e.target===card){card.click();return}
-  const link=card.querySelector('.resume');
-  if(link&&link.href&&!link.href.endsWith('#'))link.click();
+ const list=cards(),i=list.indexOf(card),key=e.key,code=e.keyCode||e.which;
+ const poster=card.querySelector('.poster-link');
+ const resume=card.querySelector('.resume');
+ const remove=card.querySelector('.remove');
+ const target=e.target;
+ const isAction=target===resume||target===remove;
+ if(key==='Enter'||key===' '||code===23||code===66){
+  if(target===card){e.preventDefault();if(poster)poster.click();return}
   return;
- }else return;
+ }
+ let nextCard=null;
+ if(key==='ArrowRight'||code===22)nextCard=list[Math.min(list.length-1,i+1)];
+ else if(key==='ArrowLeft'||code===21)nextCard=list[Math.max(0,i-1)];
+ else if((key==='ArrowDown'||code===20)&&!isAction){e.preventDefault();if(resume)resume.focus();return}
+ else if((key==='ArrowDown'||code===20)&&target===resume){e.preventDefault();if(remove)remove.focus();return}
+ else if((key==='ArrowUp'||code===19)&&target===remove){e.preventDefault();if(resume)resume.focus();return}
+ else if((key==='ArrowUp'||code===19)&&isAction){e.preventDefault();card.focus();return}
+ else if(key==='ArrowUp'||code===19){nextCard=list[Math.max(0,i-columns())]}
+ else return;
  e.preventDefault();
- if(next>=0&&list[next])list[next].focus({preventScroll:true});
+ if(nextCard)nextCard.focus();
 });
 root.addEventListener('focusin',e=>{
  const card=e.target.closest('.movie-card');
