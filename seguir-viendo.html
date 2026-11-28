@@ -222,22 +222,34 @@ function columns(){
  return template&&template!=='none'?template.split(' ').length:1;
 }
 function cards(){return Array.from(root.querySelectorAll('.movie-card'))}
-root.addEventListener('keydown',e=>{
- const card=e.target.closest('.movie-card');
- if(!card)return;
- const list=cards(),i=list.indexOf(card),key=e.key,code=e.keyCode||e.which;
+document.addEventListener('keydown',e=>{
+ const key=e.key,code=e.keyCode||e.which;
+ const left=key==='ArrowLeft'||code===21,right=key==='ArrowRight'||code===22;
+ const up=key==='ArrowUp'||code===19,down=key==='ArrowDown'||code===20;
+ const ok=key==='Enter'||key===' '||code===23||code===66;
+ if(!(left||right||up||down||ok))return;
+ const list=cards();
+ if(!list.length)return;
+ const target=e.target;
+ let card=target&&target.closest?target.closest('.movie-card'):null;
+ if(!card||!root.contains(card)){
+  card=root.querySelector('.movie-card.selected')||list[0];
+  if(!card)return;
+  e.preventDefault();
+  const poster=card.querySelector('.poster-link');
+  if(ok){if(poster)poster.click();return}
+  if(poster)poster.focus();
+  return;
+ }
+ const i=list.indexOf(card);
  const poster=card.querySelector('.poster-link');
  const resume=card.querySelector('.resume');
  const remove=card.querySelector('.remove');
- const target=e.target;
  const isResume=target===resume,isRemove=target===remove;
- const left=key==='ArrowLeft'||code===21,right=key==='ArrowRight'||code===22;
- const up=key==='ArrowUp'||code===19,down=key==='ArrowDown'||code===20;
- if(key==='Enter'||key===' '||code===23||code===66){
+ if(ok){
   if(target===card){e.preventDefault();if(poster)poster.click()}
   return;
  }
- if(!(left||right||up||down))return;
  e.preventDefault();
  let destination=null;
  if(left||right){
@@ -252,12 +264,11 @@ root.addEventListener('keydown',e=>{
   else if(isResume)destination=remove;
   else destination=list[i+columns()]?.querySelector('.remove')||null;
  }else if(up){
-  if(isRemove)destination=poster;
-  else if(isResume)destination=poster;
+  if(isRemove||isResume)destination=poster;
   else destination=list[i-columns()]?.querySelector('.poster-link')||null;
  }
  if(destination)destination.focus();
-});
+},true);
 root.addEventListener('focusin',e=>{
  const card=e.target.closest('.movie-card');
  if(card)card.scrollIntoView({block:'nearest',inline:'nearest'});
