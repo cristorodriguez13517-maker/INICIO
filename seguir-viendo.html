@@ -21,7 +21,7 @@ h1{font-size:28px;margin:0 0 3px}.sub{font-size:13px;line-height:1.5;color:#ddd;
 .poster img{display:block;width:130px;height:180px;object-fit:cover;border:3px solid transparent;border-radius:12px;transition:border-color .15s}.movie-card.selected .poster img{border-color:#e50914}
 .poster-unavailable{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#111;color:#777}
 .movie-card:focus .poster,.movie-card:focus-visible .poster,.poster-link:focus .poster,.poster-link:focus-visible .poster{outline:none!important;box-shadow:none!important;border:0!important}
-.player{position:absolute;top:7px;left:7px;width:29px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#b51226;color:#fff;box-shadow:0 1px 5px #0009}.player svg{display:block;width:20px;height:18px}.player.vlc{background:#fff}
+.continue-episode-number{position:absolute;top:7px;left:7px;z-index:3;padding:4px 7px;border-radius:4px;background:rgba(0,0,0,.82);color:#fff;font-size:12px;font-weight:700;line-height:1;text-shadow:0 1px 2px #000;pointer-events:none}.player{position:absolute;top:7px;left:7px;width:29px;height:25px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#b51226;color:#fff;box-shadow:0 1px 5px #0009}.player svg{display:block;width:20px;height:18px}.player.vlc{background:#fff}
 .info{padding:7px 1px 0}.title{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta{font-size:10px;color:#aaa;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .progress{height:4px;border-radius:5px;background:#393939;margin:7px 0 6px;overflow:hidden}.progress span{display:block;height:100%;background:#e50914}
@@ -193,6 +193,10 @@ function render(){
   const poster=document.createElement('a');poster.className='poster-link';poster.href=fichaUrl;poster.target='_self';poster.setAttribute('aria-label','Ver información de '+(item.title||'contenido'));
   const posterBox=document.createElement('div');posterBox.className='poster';
   const posterUrl=getPosterUrl(item);if(posterUrl){const img=document.createElement('img');img.src=posterUrl;img.alt=item.title||'Carátula';img.loading='eager';img.decoding='async';img.referrerPolicy='no-referrer';img.addEventListener('error',()=>{img.remove();if(!posterBox.querySelector('img'))posterBox.classList.add('poster-unavailable')},{once:true});posterBox.append(img)}else{posterBox.classList.add('poster-unavailable')}
+  const episodeMatch=String(item.title||'').match(/(?:^|\\b)T(\\d+)\\s*(?:·|-)\\s*(?:E|C)(\\d+)\\b/i)||String(item.title||'').match(/\\bT(\\d+)\\s*[- ]\\s*E(\\d+)\\b/i)||String(item.id||'').match(/S(\\d+)E(\\d+)/i);
+  if((item.repo==='SERIES'||item.repo==='ALLDEBRID-SERIES')&&episodeMatch){
+   const episodeBadge=document.createElement('span');episodeBadge.className='continue-episode-number';episodeBadge.textContent='T'+episodeMatch[1]+' · C'+String(episodeMatch[2]).padStart(2,'0');posterBox.append(episodeBadge);
+  }
   const badge=document.createElement('span');badge.className='player '+(item.player==='VLC'?'vlc':'smarttube');
   if(item.player==='VLC'){
    badge.innerHTML='<svg viewBox="0 0 24 24" role="img" aria-label="VLC"><path fill="#f28c28" d="M10.2 2.2c-.5.2-.8.8-.6 1.3l1 2.4-5.8 13.5c-.4 1 .3 2.1 1.4 2.1h11.6c1.1 0 1.8-1.1 1.4-2.1L13.4 5.9l1-2.4c.2-.5-.1-1.1-.6-1.3-.6-.2-1.2.1-1.4.7l-.5 1.2-.5-1.2c-.2-.6-.8-.9-1.2-.7Z"/><path fill="#fff" d="m8.2 10.4 7.6 1.3 1.2 2.8-10-1.7zM5.7 16.3l12.6 2.1.5 1.2H5.2z"/><path fill="#e85d24" d="m10.6 5.9 2.8.5 1.1 2.6-5-.9z"/></svg>';
